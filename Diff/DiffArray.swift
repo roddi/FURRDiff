@@ -1,0 +1,359 @@
+//
+//  DiffArray.swift
+//  DBDB
+//
+//  Created by Deecke,Roddi on 11.12.14.
+//  Copyright (c) 2014 Deecke,Roddi. All rights reserved.
+//
+
+import UIKit
+import FURRExtensions
+
+public enum DiffOperation {
+    case delete
+    case insert
+    case equal
+
+    func debugDescription() -> String {
+        switch (self) {
+        case .delete:
+            return "delete"
+        case .equal:
+            return "equal"
+        case .insert:
+            return "insert"
+        }
+    }
+}
+
+// FIXME: zum enum machen?
+public class Diff<T:Equatable>: Equatable, CustomDebugStringConvertible {
+    public var operation:DiffOperation
+    public var array:Array<T>
+
+    init(operation inOperation:DiffOperation, array inArray:Array<T>) {
+        assert(inArray.count != 0, "array may not be empty")
+        self.operation = inOperation
+        self.array = inArray
+    }
+
+    public var debugDescription: String {
+        get {
+            var result:String = self.operation.debugDescription()
+            result = result + " " + self.array.debugDescription
+
+            return result
+        }
+
+    }
+}
+
+
+
+public func == <T:Equatable> (lhs: Diff<T>, rhs: Diff<T>) -> Bool {
+    if lhs.operation != rhs.operation {
+        return false
+    }
+
+    return lhs.array == rhs.array
+}
+
+
+func diff_commonPrefix<T:Equatable>(arrayA inArrayA:Array<T>, arrayB inArrayB:Array<T>) -> Array<T> {
+    let smallerCount = (inArrayA.count < inArrayB.count) ? inArrayA.count : inArrayB.count
+
+    var common:Array<T> = []
+
+    for i in 0 ..< smallerCount {
+        if inArrayA[i] != inArrayB[i] {
+            break
+        }
+        else {
+            common.append(inArrayA[i])
+        }
+    }
+
+    return common
+}
+
+func diff_commonSuffix<T:Equatable>(arrayA inArrayA:Array<T>, arrayB inArrayB:Array<T>) -> Array<T> {
+    let smallerCount = (inArrayA.count < inArrayB.count) ? inArrayA.count : inArrayB.count
+
+    var commonReversed:Array<T> = []
+
+    for i in 0 ..< smallerCount  {
+        if inArrayA[inArrayA.count - 1 - i] != inArrayB[inArrayB.count - 1 - i] {
+            break
+        }
+        else {
+            commonReversed.append(inArrayA[inArrayA.count - 1 - i])
+        }
+    }
+
+    let common = commonReversed.reversed()
+
+    return common
+}
+
+private func diff_subArrayToIndex<T>(array inArray:Array<T>, index inIndex:Int) -> Array<T> {
+    let result = Array(inArray[0..<inIndex])
+    return result
+}
+
+private func diff_subArrayFromIndex<T>(array inArray:Array<T>, index inIndex:Int) -> Array<T> {
+    let result = Array(inArray[inIndex..<inArray.endIndex])
+    return result
+}
+
+func diff_removeCommonPrefix<T:Equatable>(arrayA inArrayA:Array<T>, arrayB inArrayB:Array<T>) -> (common:Array<T>, remainingA:Array<T>, remainingB:Array<T>) {
+    let commonPrefix = diff_commonPrefix(arrayA: inArrayA, arrayB: inArrayB)
+    let remainingArrayA = diff_subArrayFromIndex(array: inArrayA, index: commonPrefix.count)
+    let remainingArrayB = diff_subArrayFromIndex(array: inArrayB, index: commonPrefix.count)
+    return (commonPrefix, remainingArrayA, remainingArrayB)
+}
+
+func diff_removeCommonSuffix<T:Equatable>(arrayA inArrayA:Array<T>, arrayB inArrayB:Array<T>) -> (common:Array<T>, remainingA:Array<T>, remainingB:Array<T>) {
+    let commonSuffix = diff_commonSuffix(arrayA: inArrayA, arrayB: inArrayB)
+    let restOfArrayA = diff_subArrayToIndex(array: inArrayA, index: inArrayA.count - commonSuffix.count)
+    let restOfArrayB = diff_subArrayToIndex(array: inArrayB, index: inArrayB.count - commonSuffix.count)
+    return (commonSuffix, restOfArrayA, restOfArrayB)
+}
+
+public func diffBetweenArrays<T:Equatable>(arrayA inArrayA:Array<T>, arrayB inArrayB:Array<T>) -> Array<Diff<T>> {
+
+    // Check for equality (speedup).
+    if inArrayA == inArrayB {
+        if inArrayA.count != 0 {
+            return [Diff(operation:.equal, array: inArrayA)]
+        }
+        return []
+    }
+
+    var resultDiffs:Array<Diff<T>> = Array()
+
+    // Trim off common prefix (speedup).
+    let (commonPrefix, remainingSuffixArrayA, remainingSuffixArrayB) = diff_removeCommonPrefix(arrayA: inArrayA, arrayB: inArrayB)
+
+    // Trim off common suffix (speedup).
+    let (commonSuffix, remainingArrayA, remainingArrayB) = diff_removeCommonSuffix(arrayA: remainingSuffixArrayA, arrayB: remainingSuffixArrayB)
+
+    // add common suffix as equal
+    if commonPrefix.count != 0 {
+        resultDiffs.append(Diff(operation:.equal, array: commonPrefix))
+    }
+
+    // diff the remaining part
+    resultDiffs.appendContentsOf(diff_computeDiffsBetweenArrays(arrayA: remainingArrayA, arrayB: remainingArrayB))
+
+    // add the common suffix as equal
+    if commonSuffix.count != 0 {
+        resultDiffs.append(Diff(operation:.equal, array: commonSuffix))
+    }
+
+    return resultDiffs
+}
+
+
+private func diff_computeDiffsBetweenArrays<T:Equatable>(arrayA inArrayA:Array<T>, arrayB inArrayB:Array<T>) -> Array<Diff<T>> {
+    if inArrayA.count == 0 && inArrayB.count == 0 {
+        return []
+    }
+
+    if inArrayA.count == 0 {
+        // Just add some text (speedup).
+        return [Diff(operation:.insert, array:inArrayB)]
+    }
+
+    if inArrayB.count == 0 {
+        // Just delete some text (speedup).
+        return [Diff(operation:.delete, array:inArrayA)]
+    }
+
+    var longArray = inArrayA.count > inArrayB.count ? inArrayA : inArrayB
+    var shortArray = inArrayA.count > inArrayB.count ? inArrayB : inArrayA
+
+    if shortArray.count == 1 && longArray.count == 1 {
+        // Single character strings.
+        if shortArray[0] == longArray[0] {
+            return [Diff(operation: .equal, array: shortArray)]
+        }
+        else {
+            return [
+                Diff(operation: .delete, array: inArrayA),
+                Diff(operation: .insert, array: inArrayB),
+            ]
+        }
+    }
+
+    return diff_bisectOfArrays(arrayA: inArrayA, arrayB: inArrayB)
+}
+
+
+func diff_bisectOfArrays<T:Equatable>(arrayA inArrayA:Array<T>, arrayB inArrayB:Array<T>) -> Array<Diff<T>> {
+    let arrayALength = inArrayA.count
+    let arrayBLength = inArrayB.count
+    var haveFoundDiffs = false
+    var diffs:[Diff<T>]  = []
+
+    let maxD = (arrayALength + arrayBLength + 1) / 2;
+    let vOffset = maxD
+    var vLength = 2 * maxD
+
+    if vLength <= vOffset + 2 {
+        vLength = vOffset + 2
+    }
+
+    var v1 : Array<Int> = Array()
+    var v2 : Array<Int> = Array()
+
+    for _ in 0..<vLength {
+        v1.append(-1)
+        v2.append(-1)
+    }
+
+    v1[vOffset + 1] = 0
+    v2[vOffset + 1] = 0
+
+    let delta = arrayALength - arrayBLength
+
+    // If the total number of characters is odd, then the front path will collide with the reverse path.
+    let front = delta % 2 != 0
+    // BOOL front = (delta % 2 != 0);
+
+    // Offsets for start and end of k loop. Prevents mapping of space beyond the grid.
+    var k1start = 0
+    var k1end = 0
+    var k2start = 0
+    var k2end = 0
+
+    //
+    for d in 0..<maxD {
+
+        // Walk the front path one step.
+        for var k1 = -d + k1start ; k1 <= d - k1end ; k1 += 2 {
+            let k1_offset = vOffset + k1
+            var x1 = 0
+
+            if k1 == -d || (k1 != d && v1[k1_offset - 1] < v1[k1_offset + 1]) {
+                x1 = v1[k1_offset + 1]
+            }
+            else {
+                x1 = v1[k1_offset - 1] + 1
+            }
+
+            var y1 = x1 - k1
+
+            // follow the snake!
+            while x1 < arrayALength && y1 < arrayBLength && inArrayA[x1] == inArrayB[y1] {
+                x1++
+                y1++
+            }
+
+            v1[k1_offset] = x1
+
+            if x1 > arrayALength {
+                // Ran off the right of the graph.
+                k1end += 2
+            }
+            else if y1 > arrayBLength {
+                // Ran off the bottom of the graph.
+                k1start += 2
+            }
+            else if (front) {
+                let k2_offset = vOffset + delta - k1
+
+                if k2_offset >= 0 && k2_offset < vLength && v2[k2_offset] != -1 {
+                    // Mirror x2 onto top-left coordinate system.
+                    let x2 = arrayALength - v2[k2_offset]
+                    if x1 >= x2 {
+                        // diffs = diff_bisectSplitOfStrings(text1, text2, x1, y1, properties);
+                        diffs = diff_bisectSplitOfArrays(arrayA: inArrayA, arrayB: inArrayB, x: x1, y: y1)
+                        haveFoundDiffs = true
+                        break
+                    }
+                }
+            }
+        }
+
+        if haveFoundDiffs {
+            break
+        }
+
+        // Walk the reverse path one step.
+        for var k2 = -d + k2start ; k2 <= d - k2end ; k2 += 2 {
+            let k2_offset = vOffset + k2
+            var x2 = 0
+
+            if k2 == -d || (k2 != d && v2[k2_offset - 1] < v2[k2_offset + 1]) {
+                x2 = v2[k2_offset + 1]
+            }
+            else {
+                x2 = v2[k2_offset - 1] + 1
+            }
+
+            var y2 = x2 - k2
+
+            while (x2 < arrayALength && y2 < arrayBLength) && (inArrayA[arrayALength - x2 - 1] == inArrayB[arrayBLength - y2 - 1]) {
+                x2++
+                y2++
+            }
+
+            v2[k2_offset] = x2
+
+            if x2 > arrayALength {
+                // Ran off the left of the graph.
+                k2end += 2
+            }
+            else if y2 > arrayBLength {
+                // Ran off the top of the graph.
+                k2start += 2
+            } else if(!front) {
+                let k1_offset = vOffset + delta - k2
+
+                if k1_offset >= 0 && k1_offset < vLength && v1[k1_offset] != -1 {
+                    let x1 = v1[k1_offset]
+                    let y1 = vOffset + x1 - k1_offset
+                    // Mirror x2 onto top-left coordinate system.
+                    x2 = arrayALength - x2
+
+                    if x1 >= x2 {
+                        // Overlap detected.
+                        diffs = diff_bisectSplitOfArrays(arrayA: inArrayA, arrayB: inArrayB, x: x1, y: y1)
+                        haveFoundDiffs = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if(haveFoundDiffs) {
+            break;
+        }
+    }
+
+    if (!haveFoundDiffs)
+    {
+        // we have not found a shortest snake so we couldn't cut the problem in half.
+        // This means we have no common element. Just add the diffs straight away.
+        diffs = [Diff(operation: .delete, array: inArrayA)]
+        diffs.appendContentsOf([Diff(operation: .insert, array: inArrayB)])
+    }
+
+    return diffs
+}
+
+
+private func diff_bisectSplitOfArrays<T:Equatable>(arrayA inArrayA:Array<T>, arrayB inArrayB:Array<T>, x inX:Int, y inY:Int) -> Array<Diff<T>> {
+    let arrayAa = diff_subArrayToIndex(array: inArrayA, index: inX)
+    let arrayBa = diff_subArrayToIndex(array: inArrayB, index: inY)
+    let arrayAb = diff_subArrayFromIndex(array: inArrayA, index: inX)
+    let arrayBb = diff_subArrayFromIndex(array: inArrayB, index: inY)
+
+    let diffsA = diffBetweenArrays(arrayA: arrayAa, arrayB: arrayBa)
+    let diffsB = diffBetweenArrays(arrayA: arrayAb, arrayB: arrayBb)
+
+    let diffs = diffsA + diffsB
+    return diffs
+}
+
+
