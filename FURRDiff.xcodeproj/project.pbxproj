@@ -34,6 +34,7 @@
 		5698BA731B8DD18E008805E2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5698BA7C1B8DD20A008805E2 /* DiffArray.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DiffArray.swift; sourceTree = "<group>"; };
 		5698BA7E1B8DD21C008805E2 /* DiffTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DiffTests.swift; sourceTree = "<group>"; };
+		DD6449261BCD25C200E5F7FA /* Cartfile */ = {isa = PBXFileReference; lastKnownFileType = text; path = Cartfile; sourceTree = "<group>"; };
 		DD6657D21BCC0E2F00E5F7FA /* FURRExtensions.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FURRExtensions.framework; path = Carthage/Build/iOS/FURRExtensions.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -60,6 +61,7 @@
 		5698BA581B8DD18E008805E2 = {
 			isa = PBXGroup;
 			children = (
+				DD6449261BCD25C200E5F7FA /* Cartfile */,
 				DD6657D21BCC0E2F00E5F7FA /* FURRExtensions.framework */,
 				5698BA641B8DD18E008805E2 /* Diff */,
 				5698BA701B8DD18E008805E2 /* DiffTests */,
