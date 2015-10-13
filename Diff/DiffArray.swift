@@ -10,28 +10,27 @@ import UIKit
 import FURRExtensions
 
 public enum DiffOperation {
-    case delete
-    case insert
-    case equal
+    case Delete
+    case Insert
+    case Equal
 
     func debugDescription() -> String {
-        switch (self) {
-        case .delete:
+        switch self {
+        case .Delete:
             return "delete"
-        case .equal:
+        case .Equal:
             return "equal"
-        case .insert:
+        case .Insert:
             return "insert"
         }
     }
 }
 
-// FIXME: zum enum machen?
 public class Diff<T:Equatable>: Equatable, CustomDebugStringConvertible {
-    public var operation:DiffOperation
+    public var operation: DiffOperation
     public var array:Array<T>
 
-    init(operation inOperation:DiffOperation, array inArray:Array<T>) {
+    init(operation inOperation: DiffOperation, array inArray: Array<T>) {
         assert(inArray.count != 0, "array may not be empty")
         self.operation = inOperation
         self.array = inArray
@@ -39,7 +38,7 @@ public class Diff<T:Equatable>: Equatable, CustomDebugStringConvertible {
 
     public var debugDescription: String {
         get {
-            var result:String = self.operation.debugDescription()
+            var result: String = self.operation.debugDescription()
             result = result + " " + self.array.debugDescription
 
             return result
@@ -50,7 +49,7 @@ public class Diff<T:Equatable>: Equatable, CustomDebugStringConvertible {
 
 
 
-public func == <T:Equatable> (lhs: Diff<T>, rhs: Diff<T>) -> Bool {
+public func == <T: Equatable> (lhs: Diff<T>, rhs: Diff<T>) -> Bool {
     if lhs.operation != rhs.operation {
         return false
     }
@@ -95,12 +94,12 @@ func diff_commonSuffix<T:Equatable>(arrayA inArrayA:Array<T>, arrayB inArrayB:Ar
     return common
 }
 
-private func diff_subArrayToIndex<T>(array inArray:Array<T>, index inIndex:Int) -> Array<T> {
+private func diff_subArrayToIndex<T>(array inArray: Array<T>, index inIndex: Int) -> Array<T> {
     let result = Array(inArray[0..<inIndex])
     return result
 }
 
-private func diff_subArrayFromIndex<T>(array inArray:Array<T>, index inIndex:Int) -> Array<T> {
+private func diff_subArrayFromIndex<T>(array inArray: Array<T>, index inIndex: Int) -> Array<T> {
     let result = Array(inArray[inIndex..<inArray.endIndex])
     return result
 }
@@ -124,7 +123,7 @@ public func diffBetweenArrays<T:Equatable>(arrayA inArrayA:Array<T>, arrayB inAr
     // Check for equality (speedup).
     if inArrayA == inArrayB {
         if inArrayA.count != 0 {
-            return [Diff(operation:.equal, array: inArrayA)]
+            return [Diff(operation:.Equal, array: inArrayA)]
         }
         return []
     }
@@ -139,7 +138,7 @@ public func diffBetweenArrays<T:Equatable>(arrayA inArrayA:Array<T>, arrayB inAr
 
     // add common suffix as equal
     if commonPrefix.count != 0 {
-        resultDiffs.append(Diff(operation:.equal, array: commonPrefix))
+        resultDiffs.append(Diff(operation:.Equal, array: commonPrefix))
     }
 
     // diff the remaining part
@@ -147,7 +146,7 @@ public func diffBetweenArrays<T:Equatable>(arrayA inArrayA:Array<T>, arrayB inAr
 
     // add the common suffix as equal
     if commonSuffix.count != 0 {
-        resultDiffs.append(Diff(operation:.equal, array: commonSuffix))
+        resultDiffs.append(Diff(operation:.Equal, array: commonSuffix))
     }
 
     return resultDiffs
@@ -161,12 +160,12 @@ private func diff_computeDiffsBetweenArrays<T:Equatable>(arrayA inArrayA:Array<T
 
     if inArrayA.count == 0 {
         // Just add some text (speedup).
-        return [Diff(operation:.insert, array:inArrayB)]
+        return [Diff(operation:.Insert, array:inArrayB)]
     }
 
     if inArrayB.count == 0 {
         // Just delete some text (speedup).
-        return [Diff(operation:.delete, array:inArrayA)]
+        return [Diff(operation:.Delete, array:inArrayA)]
     }
 
     var longArray = inArrayA.count > inArrayB.count ? inArrayA : inArrayB
@@ -175,12 +174,12 @@ private func diff_computeDiffsBetweenArrays<T:Equatable>(arrayA inArrayA:Array<T
     if shortArray.count == 1 && longArray.count == 1 {
         // Single character strings.
         if shortArray[0] == longArray[0] {
-            return [Diff(operation: .equal, array: shortArray)]
+            return [Diff(operation: .Equal, array: shortArray)]
         }
         else {
             return [
-                Diff(operation: .delete, array: inArrayA),
-                Diff(operation: .insert, array: inArrayB),
+                Diff(operation: .Delete, array: inArrayA),
+                Diff(operation: .Insert, array: inArrayB),
             ]
         }
     }
@@ -188,7 +187,9 @@ private func diff_computeDiffsBetweenArrays<T:Equatable>(arrayA inArrayA:Array<T
     return diff_bisectOfArrays(arrayA: inArrayA, arrayB: inArrayB)
 }
 
+// yes this method is way too long. Pull requests welcome!
 
+// swiftlint:disable function_body_length
 func diff_bisectOfArrays<T:Equatable>(arrayA inArrayA:Array<T>, arrayB inArrayB:Array<T>) -> Array<Diff<T>> {
     let arrayALength = inArrayA.count
     let arrayBLength = inArrayB.count
@@ -259,7 +260,7 @@ func diff_bisectOfArrays<T:Equatable>(arrayA inArrayA:Array<T>, arrayB inArrayB:
                 // Ran off the bottom of the graph.
                 k1start += 2
             }
-            else if (front) {
+            else if front {
                 let k2_offset = vOffset + delta - k1
 
                 if k2_offset >= 0 && k2_offset < vLength && v2[k2_offset] != -1 {
@@ -293,7 +294,7 @@ func diff_bisectOfArrays<T:Equatable>(arrayA inArrayA:Array<T>, arrayB inArrayB:
 
             var y2 = x2 - k2
 
-            while (x2 < arrayALength && y2 < arrayBLength) && (inArrayA[arrayALength - x2 - 1] == inArrayB[arrayBLength - y2 - 1]) {
+            while x2 < arrayALength && y2 < arrayBLength && (inArrayA[arrayALength - x2 - 1] == inArrayB[arrayBLength - y2 - 1]) {
                 x2++
                 y2++
             }
@@ -307,7 +308,8 @@ func diff_bisectOfArrays<T:Equatable>(arrayA inArrayA:Array<T>, arrayB inArrayB:
             else if y2 > arrayBLength {
                 // Ran off the top of the graph.
                 k2start += 2
-            } else if(!front) {
+            }
+            else if !front {
                 let k1_offset = vOffset + delta - k2
 
                 if k1_offset >= 0 && k1_offset < vLength && v1[k1_offset] != -1 {
@@ -326,24 +328,23 @@ func diff_bisectOfArrays<T:Equatable>(arrayA inArrayA:Array<T>, arrayB inArrayB:
             }
         }
 
-        if(haveFoundDiffs) {
-            break;
+        if haveFoundDiffs {
+            break
         }
     }
 
-    if (!haveFoundDiffs)
-    {
+    if !haveFoundDiffs {
         // we have not found a shortest snake so we couldn't cut the problem in half.
         // This means we have no common element. Just add the diffs straight away.
-        diffs = [Diff(operation: .delete, array: inArrayA)]
-        diffs.appendContentsOf([Diff(operation: .insert, array: inArrayB)])
+        diffs = [Diff(operation: .Delete, array: inArrayA)]
+        diffs.appendContentsOf([Diff(operation: .Insert, array: inArrayB)])
     }
 
     return diffs
 }
+// swiftlint:enable function_body_length
 
-
-private func diff_bisectSplitOfArrays<T:Equatable>(arrayA inArrayA:Array<T>, arrayB inArrayB:Array<T>, x inX:Int, y inY:Int) -> Array<Diff<T>> {
+private func diff_bisectSplitOfArrays<T:Equatable>(arrayA inArrayA: Array<T>, arrayB inArrayB: Array<T>, x inX: Int, y inY: Int) -> Array<Diff<T>> {
     let arrayAa = diff_subArrayToIndex(array: inArrayA, index: inX)
     let arrayBa = diff_subArrayToIndex(array: inArrayB, index: inY)
     let arrayAb = diff_subArrayFromIndex(array: inArrayA, index: inX)
@@ -355,5 +356,3 @@ private func diff_bisectSplitOfArrays<T:Equatable>(arrayA inArrayA:Array<T>, arr
     let diffs = diffsA + diffsB
     return diffs
 }
-
-

@@ -12,6 +12,7 @@
 		5698BA7D1B8DD20A008805E2 /* DiffArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5698BA7C1B8DD20A008805E2 /* DiffArray.swift */; };
 		5698BA7F1B8DD21C008805E2 /* DiffTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5698BA7E1B8DD21C008805E2 /* DiffTests.swift */; };
 		5698BA801B8DD267008805E2 /* DiffArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5698BA7C1B8DD20A008805E2 /* DiffArray.swift */; };
+		DD2E12B51BCCFDBC00E5F7FA /* DiffArray.swift in Headers */ = {isa = PBXBuildFile; fileRef = 5698BA7C1B8DD20A008805E2 /* DiffArray.swift */; settings = {ATTRIBUTES = (Public, ); }; };
 		DD6657D31BCC0E2F00E5F7FA /* FURRExtensions.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD6657D21BCC0E2F00E5F7FA /* FURRExtensions.framework */; };
 		DD6657D41BCC18EE00E5F7FA /* FURRExtensions.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD6657D21BCC0E2F00E5F7FA /* FURRExtensions.framework */; };
 /* End PBXBuildFile section */
@@ -104,6 +105,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5698BA661B8DD18E008805E2 /* Diff.h in Headers */,
+				DD2E12B51BCCFDBC00E5F7FA /* DiffArray.swift in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -118,6 +120,7 @@
 				5698BA5E1B8DD18E008805E2 /* Frameworks */,
 				5698BA5F1B8DD18E008805E2 /* Headers */,
 				5698BA601B8DD18E008805E2 /* Resources */,
+				DD2E12BC1BCD01DF00E5F7FA /* Run swiftlint */,
 			);
 			buildRules = (
 			);
@@ -136,6 +139,7 @@
 				5698BA691B8DD18E008805E2 /* Frameworks */,
 				DD6657CE1BCBD5CB00E5F7FA /* Run Carthage Copy Script */,
 				5698BA6A1B8DD18E008805E2 /* Resources */,
+				DD2E12BD1BCD01F300E5F7FA /* Run swiftlint */,
 			);
 			buildRules = (
 			);
@@ -201,6 +205,34 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		DD2E12BC1BCD01DF00E5F7FA /* Run swiftlint */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Run swiftlint";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if which swiftlint >/dev/null; then\nswiftlint\nelse\necho \"warning: SwiftLint not installed.  Skipping lint.\"\nfi";
+		};
+		DD2E12BD1BCD01F300E5F7FA /* Run swiftlint */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Run swiftlint";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if which swiftlint >/dev/null; then\nswiftlint\nelse\necho \"warning: SwiftLint not installed.  Skipping lint.\"\nfi";
+		};
 		DD6657CE1BCBD5CB00E5F7FA /* Run Carthage Copy Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;

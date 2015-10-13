@@ -9,13 +9,16 @@
 import UIKit
 import XCTest
 
+// long test class is long (which is a good thing in this case, right?)
+
+// swiftlint:disable type_body_length
 class DiffTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
         // Put setup code here. This method is called before the invocation of each test method in the class.
     }
-    
+
     override func tearDown() {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
         super.tearDown()
@@ -92,11 +95,11 @@ class DiffTests: XCTestCase {
         let b = ["m", "a", "p"]
 
         let shouldBe = [
-            Diff(operation: .delete, array: ["c"]),
-            Diff(operation: .insert, array: ["m"]),
-            Diff(operation: .equal, array: ["a"]),
-            Diff(operation: .delete, array: ["t"]),
-            Diff(operation: .insert, array: ["p"])
+            Diff(operation: .Delete, array: ["c"]),
+            Diff(operation: .Insert, array: ["m"]),
+            Diff(operation: .Equal,  array: ["a"]),
+            Diff(operation: .Delete, array: ["t"]),
+            Diff(operation: .Insert, array: ["p"])
         ]
 
         let isActually = diff_bisectOfArrays(arrayA: a, arrayB: b)
@@ -105,8 +108,8 @@ class DiffTests: XCTestCase {
     }
 
     func test003_trivialDiffEmpty() {
-        var a:[String] = []
-        var b:[String] = []
+        var a: [String] = []
+        var b: [String] = []
 
         var shouldBe:Array<Diff<String> > = []
 
@@ -118,14 +121,14 @@ class DiffTests: XCTestCase {
 
         a = ["a"]
         b = []
-        shouldBe = [Diff(operation: .delete, array: ["a"])]
+        shouldBe = [Diff(operation: .Delete, array: ["a"])]
         isActually = diffBetweenArrays(arrayA: a, arrayB: b)
 
         XCTAssertEqual(shouldBe, isActually, "...")
 
         a = []
         b = ["b"]
-        shouldBe = [Diff(operation: .insert, array: ["b"])]
+        shouldBe = [Diff(operation: .Insert, array: ["b"])]
         isActually = diffBetweenArrays(arrayA: a, arrayB: b)
 
         XCTAssertEqual(shouldBe, isActually, "...")
@@ -133,11 +136,11 @@ class DiffTests: XCTestCase {
     }
 
     func test004_trivialDiffSame() {
-        let a:[String] = ["a","b","c"]
-        let b:[String] = ["a","b","c"]
+        let a: [String] = ["a","b","c"]
+        let b: [String] = ["a","b","c"]
 
         let shouldBe = [
-            Diff(operation: .equal, array: ["a","b","c"])
+            Diff(operation: .Equal, array: ["a","b","c"])
         ]
 
         let isActually = diffBetweenArrays(arrayA: a, arrayB: b)
@@ -146,13 +149,13 @@ class DiffTests: XCTestCase {
     }
 
     func test005_simpleInsertion() {
-        let a:[String] = ["a","b","c"]
-        let b:[String] = ["a","b", "1", "2", "3", "c"]
+        let a: [String] = ["a","b","c"]
+        let b: [String] = ["a","b", "1", "2", "3", "c"]
 
         let shouldBe:[Diff<String>] = [
-            Diff(operation: .equal, array: ["a","b"]),
-            Diff(operation: .insert, array: ["1","2","3"]),
-            Diff(operation: .equal, array: ["c"])
+            Diff(operation: .Equal, array: ["a","b"]),
+            Diff(operation: .Insert, array: ["1","2","3"]),
+            Diff(operation: .Equal, array: ["c"])
         ]
 
         let isActually = diffBetweenArrays(arrayA: a, arrayB: b)
@@ -162,13 +165,13 @@ class DiffTests: XCTestCase {
 
 
     func test006_simpleDeletion() {
-        let a:[String] = ["a","b", "1", "2", "3", "c"]
-        let b:[String] = ["a","b","c"]
+        let a: [String] = ["a","b", "1", "2", "3", "c"]
+        let b: [String] = ["a","b","c"]
 
         let shouldBe:[Diff<String>] = [
-            Diff(operation: .equal, array: ["a","b"]),
-            Diff(operation: .delete, array: ["1","2","3"]),
-            Diff(operation: .equal, array: ["c"])
+            Diff(operation: .Equal, array: ["a","b"]),
+            Diff(operation: .Delete, array: ["1","2","3"]),
+            Diff(operation: .Equal, array: ["c"])
         ]
 
         let isActually = diffBetweenArrays(arrayA: a, arrayB: b)
@@ -177,15 +180,15 @@ class DiffTests: XCTestCase {
     }
 
     func test007_twoInsertions() {
-        let a:[String] = ["a","b","c"]
-        let b:[String] = ["a", "1", "2", "3", "b", "4", "5", "6", "c"]
+        let a: [String] = ["a","b","c"]
+        let b: [String] = ["a", "1", "2", "3", "b", "4", "5", "6", "c"]
 
         let shouldBe:[Diff<String>] = [
-            Diff(operation: .equal, array: ["a"]),
-            Diff(operation: .insert, array: ["1","2","3"]),
-            Diff(operation: .equal, array: ["b"]),
-            Diff(operation: .insert, array: ["4","5","6"]),
-            Diff(operation: .equal, array: ["c"])
+            Diff(operation: .Equal, array: ["a"]),
+            Diff(operation: .Insert, array: ["1","2","3"]),
+            Diff(operation: .Equal, array: ["b"]),
+            Diff(operation: .Insert, array: ["4","5","6"]),
+            Diff(operation: .Equal, array: ["c"])
         ]
 
         let isActually = diffBetweenArrays(arrayA: a, arrayB: b)
@@ -194,15 +197,15 @@ class DiffTests: XCTestCase {
     }
 
     func test008_twoDeletions() {
-        let a:[String] = ["a", "1", "2", "3", "b", "4", "5", "6", "c"]
-        let b:[String] = ["a","b","c"]
+        let a: [String] = ["a", "1", "2", "3", "b", "4", "5", "6", "c"]
+        let b: [String] = ["a","b","c"]
 
         let shouldBe:[Diff<String>] = [
-            Diff(operation: .equal, array: ["a"]),
-            Diff(operation: .delete, array: ["1","2","3"]),
-            Diff(operation: .equal, array: ["b"]),
-            Diff(operation: .delete, array: ["4","5","6"]),
-            Diff(operation: .equal, array: ["c"])
+            Diff(operation: .Equal, array: ["a"]),
+            Diff(operation: .Delete, array: ["1","2","3"]),
+            Diff(operation: .Equal, array: ["b"]),
+            Diff(operation: .Delete, array: ["4","5","6"]),
+            Diff(operation: .Equal, array: ["c"])
         ]
 
         let isActually = diffBetweenArrays(arrayA: a, arrayB: b)
@@ -211,12 +214,12 @@ class DiffTests: XCTestCase {
     }
 
     func test009_simpleCase() {
-        let a:[String] = ["a"]
-        let b:[String] = ["b"]
+        let a: [String] = ["a"]
+        let b: [String] = ["b"]
 
         let shouldBe = [
-            Diff(operation: .delete, array: ["a"]),
-            Diff(operation: .insert, array: ["b"])
+            Diff(operation: .Delete, array: ["a"]),
+            Diff(operation: .Insert, array: ["b"])
         ]
 
         let isActually = diffBetweenArrays(arrayA: a, arrayB: b)
@@ -225,12 +228,12 @@ class DiffTests: XCTestCase {
     }
 
     func test010_prettySimpleCase() {
-        let a:[String] = ["h","e","l","g","e"]
-        let b:[String] = ["a","n","n","a"]
+        let a: [String] = ["h","e","l","g","e"]
+        let b: [String] = ["a","n","n","a"]
 
         let shouldBe = [
-            Diff(operation: .delete, array: ["h","e","l","g","e"]),
-            Diff(operation: .insert, array: ["a","n","n","a"])
+            Diff(operation: .Delete, array: ["h","e","l","g","e"]),
+            Diff(operation: .Insert, array: ["a","n","n","a"])
         ]
 
         let isActually = diffBetweenArrays(arrayA: a, arrayB: b)
@@ -243,8 +246,8 @@ class DiffTests: XCTestCase {
         let b = Array(String("anna").characters)
 
         let shouldBe = [
-            Diff(operation: .delete, array: Array(String("helge").characters)),
-            Diff(operation: .insert, array: Array(String("anna").characters))
+            Diff(operation: .Delete, array: Array(String("helge").characters)),
+            Diff(operation: .Insert, array: Array(String("anna").characters))
         ]
 
         let isActually = diffBetweenArrays(arrayA: a, arrayB: b)
@@ -253,3 +256,4 @@ class DiffTests: XCTestCase {
     }
 
 }
+// swiftlint:enable type_body_length
