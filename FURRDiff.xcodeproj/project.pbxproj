@@ -13,7 +13,6 @@
 		5698BA7F1B8DD21C008805E2 /* DiffTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5698BA7E1B8DD21C008805E2 /* DiffTests.swift */; };
 		5698BA801B8DD267008805E2 /* DiffArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5698BA7C1B8DD20A008805E2 /* DiffArray.swift */; };
 		DD2E12B51BCCFDBC00E5F7FA /* DiffArray.swift in Headers */ = {isa = PBXBuildFile; fileRef = 5698BA7C1B8DD20A008805E2 /* DiffArray.swift */; settings = {ATTRIBUTES = (Public, ); }; };
-		DD6657D31BCC0E2F00E5F7FA /* FURRExtensions.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD6657D21BCC0E2F00E5F7FA /* FURRExtensions.framework */; };
 		DD6657D41BCC18EE00E5F7FA /* FURRExtensions.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD6657D21BCC0E2F00E5F7FA /* FURRExtensions.framework */; };
 /* End PBXBuildFile section */
 
@@ -52,7 +51,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				5698BA6D1B8DD18E008805E2 /* FURRDiff.framework in Frameworks */,
-				DD6657D31BCC0E2F00E5F7FA /* FURRExtensions.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

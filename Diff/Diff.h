@@ -6,7 +6,7 @@
 //  Copyright © 2015 Ruotger Deecke. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
 
 //! Project version number for Diff.
 FOUNDATION_EXPORT double DiffVersionNumber;

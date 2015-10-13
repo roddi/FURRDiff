@@ -6,7 +6,7 @@
 //  Copyright (c) 2014 Deecke,Roddi. All rights reserved.
 //
 
-import UIKit
+import Foundation
 import FURRExtensions
 
 public enum DiffOperation {
