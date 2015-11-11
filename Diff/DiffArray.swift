@@ -66,8 +66,7 @@ func diff_commonPrefix<T:Equatable>(arrayA inArrayA:Array<T>, arrayB inArrayB:Ar
     for i in 0 ..< smallerCount {
         if inArrayA[i] != inArrayB[i] {
             break
-        }
-        else {
+        } else {
             common.append(inArrayA[i])
         }
     }
@@ -80,11 +79,10 @@ func diff_commonSuffix<T:Equatable>(arrayA inArrayA:Array<T>, arrayB inArrayB:Ar
 
     var commonReversed:Array<T> = []
 
-    for i in 0 ..< smallerCount  {
+    for i in 0 ..< smallerCount {
         if inArrayA[inArrayA.count - 1 - i] != inArrayB[inArrayB.count - 1 - i] {
             break
-        }
-        else {
+        } else {
             commonReversed.append(inArrayA[inArrayA.count - 1 - i])
         }
     }
@@ -175,8 +173,7 @@ private func diff_computeDiffsBetweenArrays<T:Equatable>(arrayA inArrayA:Array<T
         // Single character strings.
         if shortArray[0] == longArray[0] {
             return [Diff(operation: .Equal, array: shortArray)]
-        }
-        else {
+        } else {
             return [
                 Diff(operation: .Delete, array: inArrayA),
                 Diff(operation: .Insert, array: inArrayB),
@@ -237,8 +234,7 @@ func diff_bisectOfArrays<T:Equatable>(arrayA inArrayA:Array<T>, arrayB inArrayB:
 
             if k1 == -d || (k1 != d && v1[k1_offset - 1] < v1[k1_offset + 1]) {
                 x1 = v1[k1_offset + 1]
-            }
-            else {
+            } else {
                 x1 = v1[k1_offset - 1] + 1
             }
 
@@ -255,12 +251,10 @@ func diff_bisectOfArrays<T:Equatable>(arrayA inArrayA:Array<T>, arrayB inArrayB:
             if x1 > arrayALength {
                 // Ran off the right of the graph.
                 k1end += 2
-            }
-            else if y1 > arrayBLength {
+            } else if y1 > arrayBLength {
                 // Ran off the bottom of the graph.
                 k1start += 2
-            }
-            else if front {
+            } else if front {
                 let k2_offset = vOffset + delta - k1
 
                 if k2_offset >= 0 && k2_offset < vLength && v2[k2_offset] != -1 {
@@ -287,8 +281,7 @@ func diff_bisectOfArrays<T:Equatable>(arrayA inArrayA:Array<T>, arrayB inArrayB:
 
             if k2 == -d || (k2 != d && v2[k2_offset - 1] < v2[k2_offset + 1]) {
                 x2 = v2[k2_offset + 1]
-            }
-            else {
+            } else {
                 x2 = v2[k2_offset - 1] + 1
             }
 
@@ -304,12 +297,10 @@ func diff_bisectOfArrays<T:Equatable>(arrayA inArrayA:Array<T>, arrayB inArrayB:
             if x2 > arrayALength {
                 // Ran off the left of the graph.
                 k2end += 2
-            }
-            else if y2 > arrayBLength {
+            } else if y2 > arrayBLength {
                 // Ran off the top of the graph.
                 k2start += 2
-            }
-            else if !front {
+            } else if !front {
                 let k1_offset = vOffset + delta - k2
 
                 if k1_offset >= 0 && k1_offset < vLength && v1[k1_offset] != -1 {

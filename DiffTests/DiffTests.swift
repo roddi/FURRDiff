@@ -63,11 +63,11 @@ class DiffTests: XCTestCase {
 
         // some common prefix
         assertPrefix(arrayA: ["1", "2", "3", "4", "a", "b", "c", "d", "e", "f"], arrayB: ["1", "2", "3", "4", "x", "y", "z"], expCommon: ["1", "2", "3", "4"], expRemainA: ["a", "b", "c", "d", "e", "f"], expRemainB: ["x", "y", "z"])
-        assertPrefix(arrayA: [0,1,2,3,4], arrayB: [0,1,2,10,11], expCommon: [0,1,2], expRemainA: [3,4], expRemainB: [10,11])
+        assertPrefix(arrayA: [0, 1, 2, 3, 4], arrayB: [0, 1, 2, 10, 11], expCommon: [0, 1, 2], expRemainA: [3, 4], expRemainB: [10, 11])
 
         // complete string is prefix
         assertPrefix(arrayA: ["1", "2", "3", "4"], arrayB: ["1", "2", "3", "4", "x", "y", "z"], expCommon: ["1", "2", "3", "4"], expRemainA: [], expRemainB: ["x", "y", "z"])
-        assertPrefix(arrayA: [1,2,3], arrayB: [1,2], expCommon: [1,2], expRemainA: [3], expRemainB: [])
+        assertPrefix(arrayA: [1, 2, 3], arrayB: [1, 2], expCommon: [1, 2], expRemainA: [3], expRemainB: [])
 
         // empty string
         assertCommonPrefix(arrayA: [], arrayB: ["x", "y", "z"], expCommon: [], expRemainA: [], expRemainB: ["x", "y", "z"])
@@ -81,7 +81,7 @@ class DiffTests: XCTestCase {
 
         // common suffix
         assertSuffix(arrayA: ["a", "b", "c", "d", "e", "f","1", "2", "3", "4"], arrayB: ["x", "y", "z", "1", "2", "3", "4"], expCommon: ["1", "2", "3", "4"], expRemainA: ["a", "b", "c", "d", "e", "f"], expRemainB: ["x", "y", "z"])
-        assertSuffix(arrayA: [0,1,2], arrayB: [4,1,2], expCommon: [1,2], expRemainA: [0], expRemainB: [4])
+        assertSuffix(arrayA: [0, 1, 2], arrayB: [4, 1, 2], expCommon: [1, 2], expRemainA: [0], expRemainB: [4])
 
         // complete string is suffix
         assertSuffix(arrayA: ["1", "2", "3", "4"], arrayB: ["x", "y", "z", "1", "2", "3", "4"], expCommon: ["1", "2", "3", "4"], expRemainA: [], expRemainB: ["x", "y", "z"])

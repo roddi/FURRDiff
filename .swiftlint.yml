@@ -1,3 +1,9 @@
 disabled_rules: # rule identifiers to exclude from running
   - line_length
-  
+ 
+ 
+excluded: # paths to ignore during linting. overridden by `included`.
+  - Carthage
+  - Pods
+  - *.framework
+ 
