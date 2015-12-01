@@ -24,12 +24,12 @@ class DiffTests: XCTestCase {
         super.tearDown()
     }
 
-    func assertPrefix<T:Equatable>(arrayA inArrayA:Array<T>, arrayB inArrayB:Array<T>, expCommon inCommon:Array<T>, expRemainA inRemainA:Array<T>, expRemainB inRemainB:Array<T>) {
+    func assertPrefix<T: Equatable>(arrayA inArrayA: Array<T>, arrayB inArrayB: Array<T>, expCommon inCommon: Array<T>, expRemainA inRemainA: Array<T>, expRemainB inRemainB: Array<T>) {
         assertCommonPrefix(arrayA: inArrayA, arrayB: inArrayB, expCommon: inCommon, expRemainA: inRemainA, expRemainB: inRemainB)
         assertCommonPrefix(arrayA: inArrayB, arrayB: inArrayA, expCommon: inCommon, expRemainA: inRemainB, expRemainB: inRemainA)
     }
 
-    func assertCommonPrefix<T:Equatable>(arrayA inArrayA:Array<T>, arrayB inArrayB:Array<T>, expCommon inCommon:Array<T>, expRemainA inRemainA:Array<T>, expRemainB inRemainB:Array<T>) {
+    func assertCommonPrefix<T: Equatable>(arrayA inArrayA: Array<T>, arrayB inArrayB: Array<T>, expCommon inCommon: Array<T>, expRemainA inRemainA: Array<T>, expRemainB inRemainB: Array<T>) {
         let prefix = diff_commonPrefix(arrayA: inArrayA, arrayB: inArrayB)
         XCTAssert(prefix.count == inCommon.count)
 
@@ -39,12 +39,12 @@ class DiffTests: XCTestCase {
         XCTAssert(remainB == inRemainB)
     }
 
-    func assertSuffix<T:Equatable>(arrayA inArrayA:Array<T>, arrayB inArrayB:Array<T>, expCommon inCommon:Array<T>, expRemainA inRemainA:Array<T>, expRemainB inRemainB:Array<T>) {
+    func assertSuffix<T: Equatable>(arrayA inArrayA: Array<T>, arrayB inArrayB: Array<T>, expCommon inCommon: Array<T>, expRemainA inRemainA: Array<T>, expRemainB inRemainB: Array<T>) {
         assertCommonSuffix(arrayA: inArrayA, arrayB: inArrayB, expCommon: inCommon, expRemainA: inRemainA, expRemainB: inRemainB)
         assertCommonSuffix(arrayA: inArrayB, arrayB: inArrayA, expCommon: inCommon, expRemainA: inRemainB, expRemainB: inRemainA)
     }
 
-    func assertCommonSuffix<T:Equatable>(arrayA inArrayA:Array<T>, arrayB inArrayB:Array<T>, expCommon inCommon:Array<T>, expRemainA inRemainA:Array<T>, expRemainB inRemainB:Array<T>) {
+    func assertCommonSuffix<T: Equatable>(arrayA inArrayA: Array<T>, arrayB inArrayB: Array<T>, expCommon inCommon: Array<T>, expRemainA inRemainA: Array<T>, expRemainB inRemainB: Array<T>) {
         let suffix = diff_commonSuffix(arrayA: inArrayA, arrayB: inArrayB)
         XCTAssert(suffix == inCommon)
 
@@ -111,9 +111,9 @@ class DiffTests: XCTestCase {
         var a: [String] = []
         var b: [String] = []
 
-        var shouldBe:Array<Diff<String> > = []
+        var shouldBe: Array<Diff<String> > = []
 
-        var isActually:Array<Diff<String> > = diffBetweenArrays(arrayA: a, arrayB: b)
+        var isActually: Array<Diff<String> > = diffBetweenArrays(arrayA: a, arrayB: b)
 
         XCTAssertEqual(shouldBe, isActually, "...")
 
@@ -152,7 +152,7 @@ class DiffTests: XCTestCase {
         let a: [String] = ["a","b","c"]
         let b: [String] = ["a","b", "1", "2", "3", "c"]
 
-        let shouldBe:[Diff<String>] = [
+        let shouldBe: [Diff<String>] = [
             Diff(operation: .Equal, array: ["a","b"]),
             Diff(operation: .Insert, array: ["1","2","3"]),
             Diff(operation: .Equal, array: ["c"])
@@ -168,7 +168,7 @@ class DiffTests: XCTestCase {
         let a: [String] = ["a","b", "1", "2", "3", "c"]
         let b: [String] = ["a","b","c"]
 
-        let shouldBe:[Diff<String>] = [
+        let shouldBe: [Diff<String>] = [
             Diff(operation: .Equal, array: ["a","b"]),
             Diff(operation: .Delete, array: ["1","2","3"]),
             Diff(operation: .Equal, array: ["c"])
@@ -183,7 +183,7 @@ class DiffTests: XCTestCase {
         let a: [String] = ["a","b","c"]
         let b: [String] = ["a", "1", "2", "3", "b", "4", "5", "6", "c"]
 
-        let shouldBe:[Diff<String>] = [
+        let shouldBe: [Diff<String>] = [
             Diff(operation: .Equal, array: ["a"]),
             Diff(operation: .Insert, array: ["1","2","3"]),
             Diff(operation: .Equal, array: ["b"]),
@@ -200,7 +200,7 @@ class DiffTests: XCTestCase {
         let a: [String] = ["a", "1", "2", "3", "b", "4", "5", "6", "c"]
         let b: [String] = ["a","b","c"]
 
-        let shouldBe:[Diff<String>] = [
+        let shouldBe: [Diff<String>] = [
             Diff(operation: .Equal, array: ["a"]),
             Diff(operation: .Delete, array: ["1","2","3"]),
             Diff(operation: .Equal, array: ["b"]),

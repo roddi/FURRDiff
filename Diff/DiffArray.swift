@@ -28,7 +28,7 @@ public enum DiffOperation {
 
 public class Diff<T:Equatable>: Equatable, CustomDebugStringConvertible {
     public var operation: DiffOperation
-    public var array:Array<T>
+    public var array: Array<T>
 
     init(operation inOperation: DiffOperation, array inArray: Array<T>) {
         assert(inArray.count != 0, "array may not be empty")
@@ -58,10 +58,10 @@ public func == <T: Equatable> (lhs: Diff<T>, rhs: Diff<T>) -> Bool {
 }
 
 
-func diff_commonPrefix<T:Equatable>(arrayA inArrayA:Array<T>, arrayB inArrayB:Array<T>) -> Array<T> {
+func diff_commonPrefix<T: Equatable>(arrayA inArrayA: Array<T>, arrayB inArrayB: Array<T>) -> Array<T> {
     let smallerCount = (inArrayA.count < inArrayB.count) ? inArrayA.count : inArrayB.count
 
-    var common:Array<T> = []
+    var common: Array<T> = []
 
     for i in 0 ..< smallerCount {
         if inArrayA[i] != inArrayB[i] {
@@ -74,10 +74,10 @@ func diff_commonPrefix<T:Equatable>(arrayA inArrayA:Array<T>, arrayB inArrayB:Ar
     return common
 }
 
-func diff_commonSuffix<T:Equatable>(arrayA inArrayA:Array<T>, arrayB inArrayB:Array<T>) -> Array<T> {
+func diff_commonSuffix<T: Equatable>(arrayA inArrayA: Array<T>, arrayB inArrayB: Array<T>) -> Array<T> {
     let smallerCount = (inArrayA.count < inArrayB.count) ? inArrayA.count : inArrayB.count
 
-    var commonReversed:Array<T> = []
+    var commonReversed: Array<T> = []
 
     for i in 0 ..< smallerCount {
         if inArrayA[inArrayA.count - 1 - i] != inArrayB[inArrayB.count - 1 - i] {
@@ -102,21 +102,21 @@ private func diff_subArrayFromIndex<T>(array inArray: Array<T>, index inIndex: I
     return result
 }
 
-func diff_removeCommonPrefix<T:Equatable>(arrayA inArrayA:Array<T>, arrayB inArrayB:Array<T>) -> (common:Array<T>, remainingA:Array<T>, remainingB:Array<T>) {
+func diff_removeCommonPrefix<T: Equatable>(arrayA inArrayA: Array<T>, arrayB inArrayB: Array<T>) -> (common: Array<T>, remainingA: Array<T>, remainingB: Array<T>) {
     let commonPrefix = diff_commonPrefix(arrayA: inArrayA, arrayB: inArrayB)
     let remainingArrayA = diff_subArrayFromIndex(array: inArrayA, index: commonPrefix.count)
     let remainingArrayB = diff_subArrayFromIndex(array: inArrayB, index: commonPrefix.count)
     return (commonPrefix, remainingArrayA, remainingArrayB)
 }
 
-func diff_removeCommonSuffix<T:Equatable>(arrayA inArrayA:Array<T>, arrayB inArrayB:Array<T>) -> (common:Array<T>, remainingA:Array<T>, remainingB:Array<T>) {
+func diff_removeCommonSuffix<T: Equatable>(arrayA inArrayA: Array<T>, arrayB inArrayB: Array<T>) -> (common: Array<T>, remainingA: Array<T>, remainingB: Array<T>) {
     let commonSuffix = diff_commonSuffix(arrayA: inArrayA, arrayB: inArrayB)
     let restOfArrayA = diff_subArrayToIndex(array: inArrayA, index: inArrayA.count - commonSuffix.count)
     let restOfArrayB = diff_subArrayToIndex(array: inArrayB, index: inArrayB.count - commonSuffix.count)
     return (commonSuffix, restOfArrayA, restOfArrayB)
 }
 
-public func diffBetweenArrays<T:Equatable>(arrayA inArrayA:Array<T>, arrayB inArrayB:Array<T>) -> Array<Diff<T>> {
+public func diffBetweenArrays<T: Equatable>(arrayA inArrayA: Array<T>, arrayB inArrayB: Array<T>) -> Array<Diff<T>> {
 
     // Check for equality (speedup).
     if inArrayA == inArrayB {
@@ -126,7 +126,7 @@ public func diffBetweenArrays<T:Equatable>(arrayA inArrayA:Array<T>, arrayB inAr
         return []
     }
 
-    var resultDiffs:Array<Diff<T>> = Array()
+    var resultDiffs: Array<Diff<T>> = Array()
 
     // Trim off common prefix (speedup).
     let (commonPrefix, remainingSuffixArrayA, remainingSuffixArrayB) = diff_removeCommonPrefix(arrayA: inArrayA, arrayB: inArrayB)
@@ -151,7 +151,7 @@ public func diffBetweenArrays<T:Equatable>(arrayA inArrayA:Array<T>, arrayB inAr
 }
 
 
-private func diff_computeDiffsBetweenArrays<T:Equatable>(arrayA inArrayA:Array<T>, arrayB inArrayB:Array<T>) -> Array<Diff<T>> {
+private func diff_computeDiffsBetweenArrays<T: Equatable>(arrayA inArrayA: Array<T>, arrayB inArrayB: Array<T>) -> Array<Diff<T>> {
     if inArrayA.count == 0 && inArrayB.count == 0 {
         return []
     }
@@ -187,13 +187,13 @@ private func diff_computeDiffsBetweenArrays<T:Equatable>(arrayA inArrayA:Array<T
 // yes this method is way too long. Pull requests welcome!
 
 // swiftlint:disable function_body_length
-func diff_bisectOfArrays<T:Equatable>(arrayA inArrayA:Array<T>, arrayB inArrayB:Array<T>) -> Array<Diff<T>> {
+func diff_bisectOfArrays<T: Equatable>(arrayA inArrayA: Array<T>, arrayB inArrayB: Array<T>) -> Array<Diff<T>> {
     let arrayALength = inArrayA.count
     let arrayBLength = inArrayB.count
     var haveFoundDiffs = false
-    var diffs:[Diff<T>]  = []
+    var diffs: [Diff<T>]  = []
 
-    let maxD = (arrayALength + arrayBLength + 1) / 2;
+    let maxD = (arrayALength + arrayBLength + 1) / 2
     let vOffset = maxD
     var vLength = 2 * maxD
 
@@ -201,8 +201,8 @@ func diff_bisectOfArrays<T:Equatable>(arrayA inArrayA:Array<T>, arrayB inArrayB:
         vLength = vOffset + 2
     }
 
-    var v1 : Array<Int> = Array()
-    var v2 : Array<Int> = Array()
+    var v1: Array<Int> = Array()
+    var v2: Array<Int> = Array()
 
     for _ in 0..<vLength {
         v1.append(-1)
@@ -312,8 +312,8 @@ func diff_bisectOfArrays<T:Equatable>(arrayA inArrayA:Array<T>, arrayB inArrayB:
                     if x1 >= x2 {
                         // Overlap detected.
                         diffs = diff_bisectSplitOfArrays(arrayA: inArrayA, arrayB: inArrayB, x: x1, y: y1)
-                        haveFoundDiffs = true;
-                        break;
+                        haveFoundDiffs = true
+                        break
                     }
                 }
             }
@@ -335,7 +335,7 @@ func diff_bisectOfArrays<T:Equatable>(arrayA inArrayA:Array<T>, arrayB inArrayB:
 }
 // swiftlint:enable function_body_length
 
-private func diff_bisectSplitOfArrays<T:Equatable>(arrayA inArrayA: Array<T>, arrayB inArrayB: Array<T>, x inX: Int, y inY: Int) -> Array<Diff<T>> {
+private func diff_bisectSplitOfArrays<T: Equatable>(arrayA inArrayA: Array<T>, arrayB inArrayB: Array<T>, x inX: Int, y inY: Int) -> Array<Diff<T>> {
     let arrayAa = diff_subArrayToIndex(array: inArrayA, index: inX)
     let arrayBa = diff_subArrayToIndex(array: inArrayB, index: inY)
     let arrayAb = diff_subArrayFromIndex(array: inArrayA, index: inX)
