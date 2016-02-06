@@ -252,7 +252,11 @@ func diff_bisectOfArrays<T: Equatable>(arrayA inArrayA: Array<T>, arrayB inArray
     for d in 0..<maxD {
 
         // Walk the front path one step.
-        for var k1 = -d + k1start ; k1 <= d - k1end ; k1 += 2 {
+        var k1 = -d + k1start
+        while k1 <= d - k1end {
+            defer {
+                k1 += 2
+            }
             let k1_offset = vOffset + k1
             var x1 = 0
 
@@ -266,8 +270,8 @@ func diff_bisectOfArrays<T: Equatable>(arrayA inArrayA: Array<T>, arrayB inArray
 
             // follow the snake!
             while x1 < arrayALength && y1 < arrayBLength && inArrayA[x1] == inArrayB[y1] {
-                x1++
-                y1++
+                x1 += 1
+                y1 += 1
             }
 
             v1[k1_offset] = x1
@@ -299,7 +303,12 @@ func diff_bisectOfArrays<T: Equatable>(arrayA inArrayA: Array<T>, arrayB inArray
         }
 
         // Walk the reverse path one step.
-        for var k2 = -d + k2start ; k2 <= d - k2end ; k2 += 2 {
+        var k2 = -d + k2start
+        while  k2 <= d - k2end {
+
+            defer {
+                k2 += 2
+            }
             let k2_offset = vOffset + k2
             var x2 = 0
 
@@ -312,8 +321,8 @@ func diff_bisectOfArrays<T: Equatable>(arrayA inArrayA: Array<T>, arrayB inArray
             var y2 = x2 - k2
 
             while x2 < arrayALength && y2 < arrayBLength && (inArrayA[arrayALength - x2 - 1] == inArrayB[arrayBLength - y2 - 1]) {
-                x2++
-                y2++
+                x2 += 1
+                y2 += 1
             }
 
             v2[k2_offset] = x2
