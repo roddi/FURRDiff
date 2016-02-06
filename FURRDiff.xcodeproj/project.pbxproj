@@ -116,11 +116,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 5698BA761B8DD18E008805E2 /* Build configuration list for PBXNativeTarget "FURRDiff" */;
 			buildPhases = (
+				DD2E12BC1BCD01DF00E5F7FA /* Run swiftlint */,
 				5698BA5D1B8DD18E008805E2 /* Sources */,
 				5698BA5E1B8DD18E008805E2 /* Frameworks */,
 				5698BA5F1B8DD18E008805E2 /* Headers */,
 				5698BA601B8DD18E008805E2 /* Resources */,
-				DD2E12BC1BCD01DF00E5F7FA /* Run swiftlint */,
 			);
 			buildRules = (
 			);
@@ -217,7 +217,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if which swiftlint >/dev/null; then\nswiftlint\nelse\necho \"warning: SwiftLint not installed.  Skipping lint.\"\nfi";
+			shellScript = "if which swiftlint >/dev/null; then\n    swiftlint autocorrect; swiftlint\nelse\n    echo \"warning: SwiftLint not installed.  Skipping lint.\"\nfi";
 		};
 		DD2E12BD1BCD01F300E5F7FA /* Run swiftlint */ = {
 			isa = PBXShellScriptBuildPhase;
