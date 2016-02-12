@@ -1,3 +1,5 @@
+// swiftlint:disable line_length
+// swiftlint:disable cyclomatic_complexity
 //
 //  DiffArray.swift
 //  DBDB

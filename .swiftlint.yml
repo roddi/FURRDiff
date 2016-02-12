@@ -1,9 +1,4 @@
+# No disabled or configured rules, so that all all problems are solved inline.
+# The user of this code might have a different set of rules.
+
 disabled_rules: # rule identifiers to exclude from running
-  - line_length
-  - cyclomatic_complexity
- 
-excluded: # paths to ignore during linting. overridden by `included`.
-  - Carthage
-  - Pods
-  - *.framework
- 
