@@ -118,7 +118,7 @@ class DiffTests: XCTestCase {
         assertSuffix(arrayA: [0, 1, 2], arrayB: [7, 8, 9], expCommon: [], expRemainA: [0, 1, 2], expRemainB: [7, 8, 9])
 
         // common suffix
-        assertSuffix(arrayA: ["a", "b", "c", "d", "e", "f","1", "2", "3", "4"], arrayB: ["x", "y", "z", "1", "2", "3", "4"], expCommon: ["1", "2", "3", "4"], expRemainA: ["a", "b", "c", "d", "e", "f"], expRemainB: ["x", "y", "z"])
+        assertSuffix(arrayA: ["a", "b", "c", "d", "e", "f", "1", "2", "3", "4"], arrayB: ["x", "y", "z", "1", "2", "3", "4"], expCommon: ["1", "2", "3", "4"], expRemainA: ["a", "b", "c", "d", "e", "f"], expRemainB: ["x", "y", "z"])
         assertSuffix(arrayA: [0, 1, 2], arrayB: [4, 1, 2], expCommon: [1, 2], expRemainA: [0], expRemainB: [4])
 
         // complete string is suffix
@@ -135,7 +135,7 @@ class DiffTests: XCTestCase {
         let shouldBe = [
             Diff(operation: .Delete, array: ["c"]),
             Diff(operation: .Insert, array: ["m"]),
-            Diff(operation: .Equal,  array: ["a"]),
+            Diff(operation: .Equal, array: ["a"]),
             Diff(operation: .Delete, array: ["t"]),
             Diff(operation: .Insert, array: ["p"])
         ]
@@ -185,11 +185,11 @@ class DiffTests: XCTestCase {
     }
 
     func test004_trivialDiffSame() {
-        let a: [String] = ["a","b","c"]
-        let b: [String] = ["a","b","c"]
+        let a: [String] = ["a", "b", "c"]
+        let b: [String] = ["a", "b", "c"]
 
         let shouldBe = [
-            Diff(operation: .Equal, array: ["a","b","c"])
+            Diff(operation: .Equal, array: ["a", "b", "c"])
         ]
 
         let isActually = diffBetweenArrays(arrayA: a, arrayB: b)
@@ -199,12 +199,12 @@ class DiffTests: XCTestCase {
     }
 
     func test005_simpleInsertion() {
-        let a: [String] = ["a","b","c"]
-        let b: [String] = ["a","b", "1", "2", "3", "c"]
+        let a: [String] = ["a", "b", "c"]
+        let b: [String] = ["a", "b", "1", "2", "3", "c"]
 
         let shouldBe: [Diff<String>] = [
-            Diff(operation: .Equal, array: ["a","b"]),
-            Diff(operation: .Insert, array: ["1","2","3"]),
+            Diff(operation: .Equal, array: ["a", "b"]),
+            Diff(operation: .Insert, array: ["1", "2", "3"]),
             Diff(operation: .Equal, array: ["c"])
         ]
 
@@ -216,12 +216,12 @@ class DiffTests: XCTestCase {
 
 
     func test006_simpleDeletion() {
-        let a: [String] = ["a","b", "1", "2", "3", "c"]
-        let b: [String] = ["a","b","c"]
+        let a: [String] = ["a", "b", "1", "2", "3", "c"]
+        let b: [String] = ["a", "b", "c"]
 
         let shouldBe: [Diff<String>] = [
-            Diff(operation: .Equal, array: ["a","b"]),
-            Diff(operation: .Delete, array: ["1","2","3"]),
+            Diff(operation: .Equal, array: ["a", "b"]),
+            Diff(operation: .Delete, array: ["1", "2", "3"]),
             Diff(operation: .Equal, array: ["c"])
         ]
 
@@ -232,14 +232,14 @@ class DiffTests: XCTestCase {
     }
 
     func test007_twoInsertions() {
-        let a: [String] = ["a","b","c"]
+        let a: [String] = ["a", "b", "c"]
         let b: [String] = ["a", "1", "2", "3", "b", "4", "5", "6", "c"]
 
         let shouldBe: [Diff<String>] = [
             Diff(operation: .Equal, array: ["a"]),
-            Diff(operation: .Insert, array: ["1","2","3"]),
+            Diff(operation: .Insert, array: ["1", "2", "3"]),
             Diff(operation: .Equal, array: ["b"]),
-            Diff(operation: .Insert, array: ["4","5","6"]),
+            Diff(operation: .Insert, array: ["4", "5", "6"]),
             Diff(operation: .Equal, array: ["c"])
         ]
 
@@ -251,13 +251,13 @@ class DiffTests: XCTestCase {
 
     func test008_twoDeletions() {
         let a: [String] = ["a", "1", "2", "3", "b", "4", "5", "6", "c"]
-        let b: [String] = ["a","b","c"]
+        let b: [String] = ["a", "b", "c"]
 
         let shouldBe: [Diff<String>] = [
             Diff(operation: .Equal, array: ["a"]),
-            Diff(operation: .Delete, array: ["1","2","3"]),
+            Diff(operation: .Delete, array: ["1", "2", "3"]),
             Diff(operation: .Equal, array: ["b"]),
-            Diff(operation: .Delete, array: ["4","5","6"]),
+            Diff(operation: .Delete, array: ["4", "5", "6"]),
             Diff(operation: .Equal, array: ["c"])
         ]
 
@@ -283,12 +283,12 @@ class DiffTests: XCTestCase {
     }
 
     func test010_prettySimpleCase() {
-        let a: [String] = ["h","e","l","g","e"]
-        let b: [String] = ["a","n","n","a"]
+        let a: [String] = ["h", "e", "l", "g", "e"]
+        let b: [String] = ["a", "n", "n", "a"]
 
         let shouldBe = [
-            Diff(operation: .Delete, array: ["h","e","l","g","e"]),
-            Diff(operation: .Insert, array: ["a","n","n","a"])
+            Diff(operation: .Delete, array: ["h", "e", "l", "g", "e"]),
+            Diff(operation: .Insert, array: ["a", "n", "n", "a"])
         ]
 
         let isActually = diffBetweenArrays(arrayA: a, arrayB: b)
