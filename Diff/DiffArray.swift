@@ -118,7 +118,11 @@ private func diff_appendDiffAndCompact<T>(array inArray: Array<Diff<T>>, diff: D
     }
 
     if diff.operation == lastDiff.operation {
-        lastDiff.array.appendContentsOf(diff.array)
+        #if swift(>=3.0)
+            lastDiff.array.append(contentsOf:diff.array)
+        #else
+            lastDiff.array.appendContentsOf(diff.array)
+        #endif
         return inArray
     } else {
         var newArray = inArray
@@ -363,7 +367,11 @@ func diff_bisectOfArrays<T: Equatable>(arrayA inArrayA: Array<T>, arrayB inArray
         // we have not found a shortest snake so we couldn't cut the problem in half.
         // This means we have no common element. Just add the diffs straight away.
         diffs = [Diff(operation: .Delete, array: inArrayA)]
-        diffs.appendContentsOf([Diff(operation: .Insert, array: inArrayB)])
+        #if swift(>=3.0)
+            diffs.append(contentsOf:[Diff(operation: .Insert, array: inArrayB)])
+        #else
+            diffs.appendContentsOf([Diff(operation: .Insert, array: inArrayB)])
+        #endif
     }
 
     return diffs
@@ -371,9 +379,9 @@ func diff_bisectOfArrays<T: Equatable>(arrayA inArrayA: Array<T>, arrayB inArray
 // swiftlint:enable function_body_length
 
 private func diff_bisectSplitOfArrays<T: Equatable>(arrayA inArrayA: Array<T>,
-    arrayB inArrayB: Array<T>,
-    x inX: Int,
-    y inY: Int) -> Array<Diff<T>> {
+                                      arrayB inArrayB: Array<T>,
+                                      x inX: Int,
+                                      y inY: Int) -> Array<Diff<T>> {
     let arrayAa = diff_subArrayToIndex(array: inArrayA, index: inX)
     let arrayBa = diff_subArrayToIndex(array: inArrayB, index: inY)
     let arrayAb = diff_subArrayFromIndex(array: inArrayA, index: inX)
