@@ -74,6 +74,12 @@ class DiffTests: XCTestCase {
         XCTAssert(remainB == inRemainB)
     }
 
+    #if swift(>=3.0)
+    func thenDiffsShouldNotContainRepeatedDiffTypes<T: Equatable>(_ array: Array<Diff<T>>) {
+        thenDiffsShouldNotContainRepeatedDiffTypes(array: array)
+    }
+    #endif
+
     func thenDiffsShouldNotContainRepeatedDiffTypes<T: Equatable>(array: Array<Diff<T>>) {
         if array.count < 2 {
             return
