@@ -28,6 +28,7 @@
 
 import Foundation
 import XCTest
+@testable import FURRDiff
 
 // long test class is long (which is a good thing in this case, right?)
 
