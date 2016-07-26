@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 47;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -11,7 +11,6 @@
 		5698BA6D1B8DD18E008805E2 /* FURRDiff.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5698BA621B8DD18E008805E2 /* FURRDiff.framework */; };
 		5698BA7D1B8DD20A008805E2 /* DiffArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5698BA7C1B8DD20A008805E2 /* DiffArray.swift */; };
 		5698BA7F1B8DD21C008805E2 /* DiffTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5698BA7E1B8DD21C008805E2 /* DiffTests.swift */; };
-		5698BA801B8DD267008805E2 /* DiffArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5698BA7C1B8DD20A008805E2 /* DiffArray.swift */; };
 		DD2E12B51BCCFDBC00E5F7FA /* DiffArray.swift in Headers */ = {isa = PBXBuildFile; fileRef = 5698BA7C1B8DD20A008805E2 /* DiffArray.swift */; settings = {ATTRIBUTES = (Public, ); }; };
 		DD6657D41BCC18EE00E5F7FA /* FURRExtensions.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD6657D21BCC0E2F00E5F7FA /* FURRExtensions.framework */; };
 /* End PBXBuildFile section */
@@ -172,7 +171,7 @@
 				};
 			};
 			buildConfigurationList = 5698BA5C1B8DD18E008805E2 /* Build configuration list for PBXProject "FURRDiff" */;
-			compatibilityVersion = "Xcode 3.2";
+			compatibilityVersion = "Xcode 6.3";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -266,7 +265,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				5698BA7F1B8DD21C008805E2 /* DiffTests.swift in Sources */,
-				5698BA801B8DD267008805E2 /* DiffArray.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -423,6 +421,7 @@
 		5698BA7A1B8DD18E008805E2 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				DEFINES_MODULE = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
@@ -430,6 +429,7 @@
 				INFOPLIST_FILE = DiffTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.RuotgerSkupin.DiffTests;
+				PRODUCT_MODULE_NAME = FURRDiffTests;
 				PRODUCT_NAME = FURRDiff;
 			};
 			name = Debug;
@@ -437,6 +437,7 @@
 		5698BA7B1B8DD18E008805E2 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				DEFINES_MODULE = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
@@ -444,6 +445,7 @@
 				INFOPLIST_FILE = DiffTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.RuotgerSkupin.DiffTests;
+				PRODUCT_MODULE_NAME = FURRDiffTests;
 				PRODUCT_NAME = FURRDiff;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 			};
