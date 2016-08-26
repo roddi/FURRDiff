@@ -1,4 +1,5 @@
 // swiftlint:disable line_length
+// swiftlint:disable file_length
 // swiftlint:disable cyclomatic_complexity
 //
 //  DiffArray.swift
@@ -124,11 +125,11 @@ private func diff_appendDiffAndCompact<T>(array inArray: Array<Diff<T>>, diff: D
             lastDiff.array.appendContentsOf(diff.array)
         #endif
         return inArray
-    } else {
-        var newArray = inArray
-        newArray.append(diff)
-        return newArray
     }
+
+    var newArray = inArray
+    newArray.append(diff)
+    return newArray
 }
 
 func diff_removeCommonPrefix<T: Equatable>(arrayA inArrayA: Array<T>, arrayB inArrayB: Array<T>) -> (common: Array<T>, remainingA: Array<T>, remainingB: Array<T>) {
@@ -183,6 +184,9 @@ public func diffBetweenArrays<T: Equatable>(arrayA inArrayA: Array<T>, arrayB in
 
 private func diff_computeDiffsBetweenArrays<T: Equatable>(arrayA inArrayA: Array<T>, arrayB inArrayB: Array<T>) -> Array<Diff<T>> {
     if inArrayA.count == 0 && inArrayB.count == 0 {
+        // this case is not covered by the tests so I put a assert here.
+        // please file a bug if it is hit!
+        assertionFailure("Please file a bug!")
         return []
     }
 
@@ -202,13 +206,16 @@ private func diff_computeDiffsBetweenArrays<T: Equatable>(arrayA inArrayA: Array
     if shortArray.count == 1 && longArray.count == 1 {
         // Single character strings.
         if shortArray[0] == longArray[0] {
+            // this case is not covered by the tests so I put a assert here.
+            // please file a bug if it is hit!
+            assertionFailure("Please file a bug!")
             return [Diff(operation: .Equal, array: shortArray)]
-        } else {
-            return [
-                Diff(operation: .Delete, array: inArrayA),
-                Diff(operation: .Insert, array: inArrayB),
-            ]
         }
+
+        return [
+            Diff(operation: .Delete, array: inArrayA),
+            Diff(operation: .Insert, array: inArrayB),
+        ]
     }
 
     return diff_bisectOfArrays(arrayA: inArrayA, arrayB: inArrayB)

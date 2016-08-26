@@ -331,5 +331,17 @@ class DiffTests: XCTestCase {
         self.thenDiffsShouldNotContainRepeatedDiffTypes(isActually)
     }
 
+    // this test is more a code coverage test. The debug description is not a vital part
+    // so we only make sure it doesn't crash.
+    func test013_debugDescription() {
+        let a: [String] = ["h", "e", "l", "g", "a"]
+        let b: [String] = ["a", "n", "n", "a"]
+
+        let isActually = diffBetweenArrays(arrayA: a, arrayB: b)
+
+        print("debug description: \(isActually)")
+    }
 }
+
+
 // swiftlint:enable type_body_length
