@@ -1,2 +1,2 @@
-#github "roddi/FURRExtensions"
-git "file:///Users/roddi/GitDev/FURRExtensions"
+github "roddi/FURRExtensions"
+#git "file:///Users/roddi/GitDev/FURRExtensions" "master"
