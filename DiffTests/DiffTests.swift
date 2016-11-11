@@ -334,12 +334,12 @@ class DiffTests: XCTestCase {
     // this test is more a code coverage test. The debug description is not a vital part
     // so we only make sure it doesn't crash.
     func test013_debugDescription() {
-        let a: [String] = ["h", "e", "l", "g", "a"]
-        let b: [String] = ["a", "n", "n", "a"]
+        let a: [String] = ["h", "e", "l", "l", "o"]
+        let b: [String] = ["w", "o", "r", "l", "d"]
 
-        let isActually = diffBetweenArrays(arrayA: a, arrayB: b)
+        let diffs = diffBetweenArrays(arrayA: a, arrayB: b)
 
-        print("debug description: \(isActually)")
+        print("debug description: \(diffs)")
     }
 }
 
