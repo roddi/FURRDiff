@@ -45,43 +45,37 @@ class DiffTests: XCTestCase {
         super.tearDown()
     }
 
-    func assertPrefix<T: Equatable>(arrayA inArrayA: Array<T>, arrayB inArrayB: Array<T>, expCommon inCommon: Array<T>, expRemainA inRemainA: Array<T>, expRemainB inRemainB: Array<T>) {
-        assertCommonPrefix(arrayA: inArrayA, arrayB: inArrayB, expCommon: inCommon, expRemainA: inRemainA, expRemainB: inRemainB)
-        assertCommonPrefix(arrayA: inArrayB, arrayB: inArrayA, expCommon: inCommon, expRemainA: inRemainB, expRemainB: inRemainA)
+    func assertPrefix<T: Equatable>(arrayA: [T], arrayB: [T], expCommon: [T], expRemainA: [T], expRemainB: [T]) {
+        assertCommonPrefix(arrayA: arrayA, arrayB: arrayB, expCommon: expCommon, expRemainA: expRemainA, expRemainB: expRemainB)
+        assertCommonPrefix(arrayA: arrayB, arrayB: arrayA, expCommon: expCommon, expRemainA: expRemainB, expRemainB: expRemainA)
     }
 
-    func assertCommonPrefix<T: Equatable>(arrayA inArrayA: Array<T>, arrayB inArrayB: Array<T>, expCommon inCommon: Array<T>, expRemainA inRemainA: Array<T>, expRemainB inRemainB: Array<T>) {
-        let prefix = diff_commonPrefix(arrayA: inArrayA, arrayB: inArrayB)
-        XCTAssert(prefix.count == inCommon.count)
+    func assertCommonPrefix<T: Equatable>(arrayA: [T], arrayB: [T], expCommon: [T], expRemainA: [T], expRemainB: [T]) {
+        let prefix = diff_commonPrefix(arrayA: arrayA, arrayB: arrayB)
+        XCTAssert(prefix.count == expCommon.count)
 
-        let (commonPrefix, remainA, remainB) = diff_removeCommonPrefix(arrayA:inArrayA, arrayB:inArrayB)
-        XCTAssert(commonPrefix == inCommon)
-        XCTAssert(remainA == inRemainA)
-        XCTAssert(remainB == inRemainB)
+        let commonPrefixAndRemains = diff_removeCommonPrefix(arrayA: arrayA, arrayB: arrayB)
+        XCTAssert(commonPrefixAndRemains.common == expCommon)
+        XCTAssert(commonPrefixAndRemains.remainingA == expRemainA)
+        XCTAssert(commonPrefixAndRemains.remainingB == expRemainB)
     }
 
-    func assertSuffix<T: Equatable>(arrayA inArrayA: Array<T>, arrayB inArrayB: Array<T>, expCommon inCommon: Array<T>, expRemainA inRemainA: Array<T>, expRemainB inRemainB: Array<T>) {
-        assertCommonSuffix(arrayA: inArrayA, arrayB: inArrayB, expCommon: inCommon, expRemainA: inRemainA, expRemainB: inRemainB)
-        assertCommonSuffix(arrayA: inArrayB, arrayB: inArrayA, expCommon: inCommon, expRemainA: inRemainB, expRemainB: inRemainA)
+    func assertSuffix<T: Equatable>(arrayA: [T], arrayB: [T], expCommon: [T], expRemainA: [T], expRemainB: [T]) {
+        assertCommonSuffix(arrayA: arrayA, arrayB: arrayB, expCommon: expCommon, expRemainA: expRemainA, expRemainB: expRemainB)
+        assertCommonSuffix(arrayA: arrayB, arrayB: arrayA, expCommon: expCommon, expRemainA: expRemainB, expRemainB: expRemainA)
     }
 
-    func assertCommonSuffix<T: Equatable>(arrayA inArrayA: Array<T>, arrayB inArrayB: Array<T>, expCommon inCommon: Array<T>, expRemainA inRemainA: Array<T>, expRemainB inRemainB: Array<T>) {
-        let suffix = diff_commonSuffix(arrayA: inArrayA, arrayB: inArrayB)
-        XCTAssert(suffix == inCommon)
+    func assertCommonSuffix<T: Equatable>(arrayA: [T], arrayB: [T], expCommon: [T], expRemainA: [T], expRemainB: [T]) {
+        let suffix = diff_commonSuffix(arrayA: arrayA, arrayB: arrayB)
+        XCTAssert(suffix == expCommon)
 
-        let (common, remainA, remainB) = diff_removeCommonSuffix(arrayA: inArrayA, arrayB: inArrayB)
-        XCTAssert(common == inCommon)
-        XCTAssert(remainA == inRemainA)
-        XCTAssert(remainB == inRemainB)
+        let commonSuffixAndRemains = diff_removeCommonSuffix(arrayA: arrayA, arrayB: arrayB)
+        XCTAssert(commonSuffixAndRemains.common == expCommon)
+        XCTAssert(commonSuffixAndRemains.remainingA == expRemainA)
+        XCTAssert(commonSuffixAndRemains.remainingB == expRemainB)
     }
 
-    #if swift(>=3.0)
-    func thenDiffsShouldNotContainRepeatedDiffTypes<T: Equatable>(_ array: Array<Diff<T>>) {
-        thenDiffsShouldNotContainRepeatedDiffTypes(array: array)
-    }
-    #endif
-
-    func thenDiffsShouldNotContainRepeatedDiffTypes<T: Equatable>(array: Array<Diff<T>>) {
+    func thenDiffsShouldNotContainRepeatedDiffTypes<T: Equatable>(array: [Diff<T>]) {
         if array.count < 2 {
             return
         }
@@ -91,7 +85,7 @@ class DiffTests: XCTestCase {
             return
         }
 
-        var lastDiffOperation = firstDiff.operation == DiffOperation.Delete ? DiffOperation.Insert : DiffOperation.Delete
+        var lastDiffOperation = firstDiff.operation == DiffOperation.delete ? DiffOperation.insert : DiffOperation.delete
 
         for diff in array {
             XCTAssertNotEqual(lastDiffOperation, diff.operation)
@@ -105,7 +99,6 @@ class DiffTests: XCTestCase {
         assertPrefix(arrayA: [0, 1, 2], arrayB: [7, 8, 9], expCommon: [], expRemainA: [0, 1, 2], expRemainB: [7, 8, 9])
         assertPrefix(arrayA: ["aa", "bb", "cc"], arrayB: ["xx", "yy", "zz"], expCommon: [], expRemainA: ["aa", "bb", "cc"], expRemainB: ["xx", "yy", "zz"])
 
-
         // some common prefix
         assertPrefix(arrayA: ["1", "2", "3", "4", "a", "b", "c", "d", "e", "f"], arrayB: ["1", "2", "3", "4", "x", "y", "z"], expCommon: ["1", "2", "3", "4"], expRemainA: ["a", "b", "c", "d", "e", "f"], expRemainB: ["x", "y", "z"])
         assertPrefix(arrayA: [0, 1, 2, 3, 4], arrayB: [0, 1, 2, 10, 11], expCommon: [0, 1, 2], expRemainA: [3, 4], expRemainB: [10, 11])
@@ -117,7 +110,6 @@ class DiffTests: XCTestCase {
         // empty string
         assertCommonPrefix(arrayA: [], arrayB: ["x", "y", "z"], expCommon: [], expRemainA: [], expRemainB: ["x", "y", "z"])
     }
-
 
     func test001_commonSuffix() {
         // no common suffix
@@ -140,54 +132,54 @@ class DiffTests: XCTestCase {
         let b = ["m", "a", "p"]
 
         let shouldBe = [
-            Diff(operation: .Delete, array: ["c"]),
-            Diff(operation: .Insert, array: ["m"]),
-            Diff(operation: .Equal, array: ["a"]),
-            Diff(operation: .Delete, array: ["t"]),
-            Diff(operation: .Insert, array: ["p"])
+            Diff(operation: .delete, array: ["c"]),
+            Diff(operation: .insert, array: ["m"]),
+            Diff(operation: .equal, array: ["a"]),
+            Diff(operation: .delete, array: ["t"]),
+            Diff(operation: .insert, array: ["p"])
         ]
 
         let isActually = diff_bisectOfArrays(arrayA: a, arrayB: b)
 
         XCTAssertEqual(shouldBe, isActually, "...")
-        self.thenDiffsShouldNotContainRepeatedDiffTypes(isActually)
+        self.thenDiffsShouldNotContainRepeatedDiffTypes(array: isActually)
     }
 
     func test_equalOperatorForDiffs() {
-        XCTAssert(Diff(operation: .Delete, array: ["bla"]) == Diff(operation: .Delete, array: ["bla"]))
-        XCTAssert(Diff(operation: .Delete, array: ["bla"]) == Diff(operation: .Delete, array: ["bla"]))
-        XCTAssert(Diff(operation: .Insert, array: ["bla"]) != Diff(operation: .Delete, array: ["bla"]))
-        XCTAssert(Diff(operation: .Delete, array: ["bla"]) != Diff(operation: .Delete, array: ["blubb"]))
+        XCTAssert(Diff(operation: .delete, array: ["bla"]) == Diff(operation: .delete, array: ["bla"]))
+        XCTAssert(Diff(operation: .delete, array: ["bla"]) == Diff(operation: .delete, array: ["bla"]))
+        XCTAssert(Diff(operation: .insert, array: ["bla"]) != Diff(operation: .delete, array: ["bla"]))
+        XCTAssert(Diff(operation: .delete, array: ["bla"]) != Diff(operation: .delete, array: ["blubb"]))
     }
 
     func test003_trivialDiffEmpty() {
         var a: [String] = []
         var b: [String] = []
 
-        var shouldBe: Array<Diff<String> > = []
+        var shouldBe: [Diff<String>] = []
 
-        var isActually: Array<Diff<String> > = diffBetweenArrays(arrayA: a, arrayB: b)
+        var isActually: [Diff<String>] = diffBetweenArrays(arrayA: a, arrayB: b)
 
         XCTAssertEqual(shouldBe, isActually, "...")
-        self.thenDiffsShouldNotContainRepeatedDiffTypes(isActually)
+        self.thenDiffsShouldNotContainRepeatedDiffTypes(array: isActually)
 
         // ----
 
         a = ["a"]
         b = []
-        shouldBe = [Diff(operation: .Delete, array: ["a"])]
+        shouldBe = [Diff(operation: .delete, array: ["a"])]
         isActually = diffBetweenArrays(arrayA: a, arrayB: b)
 
         XCTAssertEqual(shouldBe, isActually, "...")
-        self.thenDiffsShouldNotContainRepeatedDiffTypes(isActually)
+        self.thenDiffsShouldNotContainRepeatedDiffTypes(array: isActually)
 
         a = []
         b = ["b"]
-        shouldBe = [Diff(operation: .Insert, array: ["b"])]
+        shouldBe = [Diff(operation: .insert, array: ["b"])]
         isActually = diffBetweenArrays(arrayA: a, arrayB: b)
 
         XCTAssertEqual(shouldBe, isActually, "...")
-        self.thenDiffsShouldNotContainRepeatedDiffTypes(isActually)
+        self.thenDiffsShouldNotContainRepeatedDiffTypes(array: isActually)
 
     }
 
@@ -196,13 +188,13 @@ class DiffTests: XCTestCase {
         let b: [String] = ["a", "b", "c"]
 
         let shouldBe = [
-            Diff(operation: .Equal, array: ["a", "b", "c"])
+            Diff(operation: .equal, array: ["a", "b", "c"])
         ]
 
         let isActually = diffBetweenArrays(arrayA: a, arrayB: b)
 
         XCTAssertEqual(shouldBe, isActually, "...")
-        self.thenDiffsShouldNotContainRepeatedDiffTypes(isActually)
+        self.thenDiffsShouldNotContainRepeatedDiffTypes(array: isActually)
     }
 
     func test005_simpleInsertion() {
@@ -210,32 +202,31 @@ class DiffTests: XCTestCase {
         let b: [String] = ["a", "b", "1", "2", "3", "c"]
 
         let shouldBe: [Diff<String>] = [
-            Diff(operation: .Equal, array: ["a", "b"]),
-            Diff(operation: .Insert, array: ["1", "2", "3"]),
-            Diff(operation: .Equal, array: ["c"])
+            Diff(operation: .equal, array: ["a", "b"]),
+            Diff(operation: .insert, array: ["1", "2", "3"]),
+            Diff(operation: .equal, array: ["c"])
         ]
 
         let isActually = diffBetweenArrays(arrayA: a, arrayB: b)
 
         XCTAssertEqual(shouldBe, isActually, "...")
-        self.thenDiffsShouldNotContainRepeatedDiffTypes(isActually)
+        self.thenDiffsShouldNotContainRepeatedDiffTypes(array: isActually)
     }
-
 
     func test006_simpleDeletion() {
         let a: [String] = ["a", "b", "1", "2", "3", "c"]
         let b: [String] = ["a", "b", "c"]
 
         let shouldBe: [Diff<String>] = [
-            Diff(operation: .Equal, array: ["a", "b"]),
-            Diff(operation: .Delete, array: ["1", "2", "3"]),
-            Diff(operation: .Equal, array: ["c"])
+            Diff(operation: .equal, array: ["a", "b"]),
+            Diff(operation: .delete, array: ["1", "2", "3"]),
+            Diff(operation: .equal, array: ["c"])
         ]
 
         let isActually = diffBetweenArrays(arrayA: a, arrayB: b)
 
         XCTAssertEqual(shouldBe, isActually, "...")
-        self.thenDiffsShouldNotContainRepeatedDiffTypes(isActually)
+        self.thenDiffsShouldNotContainRepeatedDiffTypes(array: isActually)
     }
 
     func test007_twoInsertions() {
@@ -243,17 +234,17 @@ class DiffTests: XCTestCase {
         let b: [String] = ["a", "1", "2", "3", "b", "4", "5", "6", "c"]
 
         let shouldBe: [Diff<String>] = [
-            Diff(operation: .Equal, array: ["a"]),
-            Diff(operation: .Insert, array: ["1", "2", "3"]),
-            Diff(operation: .Equal, array: ["b"]),
-            Diff(operation: .Insert, array: ["4", "5", "6"]),
-            Diff(operation: .Equal, array: ["c"])
+            Diff(operation: .equal, array: ["a"]),
+            Diff(operation: .insert, array: ["1", "2", "3"]),
+            Diff(operation: .equal, array: ["b"]),
+            Diff(operation: .insert, array: ["4", "5", "6"]),
+            Diff(operation: .equal, array: ["c"])
         ]
 
         let isActually = diffBetweenArrays(arrayA: a, arrayB: b)
 
         XCTAssertEqual(shouldBe, isActually, "...")
-        self.thenDiffsShouldNotContainRepeatedDiffTypes(isActually)
+        self.thenDiffsShouldNotContainRepeatedDiffTypes(array: isActually)
     }
 
     func test008_twoDeletions() {
@@ -261,17 +252,17 @@ class DiffTests: XCTestCase {
         let b: [String] = ["a", "b", "c"]
 
         let shouldBe: [Diff<String>] = [
-            Diff(operation: .Equal, array: ["a"]),
-            Diff(operation: .Delete, array: ["1", "2", "3"]),
-            Diff(operation: .Equal, array: ["b"]),
-            Diff(operation: .Delete, array: ["4", "5", "6"]),
-            Diff(operation: .Equal, array: ["c"])
+            Diff(operation: .equal, array: ["a"]),
+            Diff(operation: .delete, array: ["1", "2", "3"]),
+            Diff(operation: .equal, array: ["b"]),
+            Diff(operation: .delete, array: ["4", "5", "6"]),
+            Diff(operation: .equal, array: ["c"])
         ]
 
         let isActually = diffBetweenArrays(arrayA: a, arrayB: b)
 
         XCTAssertEqual(shouldBe, isActually, "...")
-        self.thenDiffsShouldNotContainRepeatedDiffTypes(isActually)
+        self.thenDiffsShouldNotContainRepeatedDiffTypes(array: isActually)
     }
 
     func test009_simpleCase() {
@@ -279,14 +270,14 @@ class DiffTests: XCTestCase {
         let b: [String] = ["b"]
 
         let shouldBe = [
-            Diff(operation: .Delete, array: ["a"]),
-            Diff(operation: .Insert, array: ["b"])
+            Diff(operation: .delete, array: ["a"]),
+            Diff(operation: .insert, array: ["b"])
         ]
 
         let isActually = diffBetweenArrays(arrayA: a, arrayB: b)
 
         XCTAssertEqual(shouldBe, isActually, "...")
-        self.thenDiffsShouldNotContainRepeatedDiffTypes(isActually)
+        self.thenDiffsShouldNotContainRepeatedDiffTypes(array: isActually)
     }
 
     func test010_prettySimpleCase() {
@@ -294,14 +285,14 @@ class DiffTests: XCTestCase {
         let b: [String] = ["a", "n", "n", "a"]
 
         let shouldBe = [
-            Diff(operation: .Delete, array: ["h", "e", "l", "g", "e"]),
-            Diff(operation: .Insert, array: ["a", "n", "n", "a"])
+            Diff(operation: .delete, array: ["h", "e", "l", "g", "e"]),
+            Diff(operation: .insert, array: ["a", "n", "n", "a"])
         ]
 
         let isActually = diffBetweenArrays(arrayA: a, arrayB: b)
 
         XCTAssertEqual(shouldBe, isActually, "...")
-        self.thenDiffsShouldNotContainRepeatedDiffTypes(isActually)
+        self.thenDiffsShouldNotContainRepeatedDiffTypes(array: isActually)
     }
 
     func test011_prettySimpleCaseWithCharacters() {
@@ -309,14 +300,14 @@ class DiffTests: XCTestCase {
         let b = Array(String("anna").characters)
 
         let shouldBe = [
-            Diff(operation: .Delete, array: Array(String("helge").characters)),
-            Diff(operation: .Insert, array: Array(String("anna").characters))
+            Diff(operation: .delete, array: Array(String("helge").characters)),
+            Diff(operation: .insert, array: Array(String("anna").characters))
         ]
 
         let isActually = diffBetweenArrays(arrayA: a, arrayB: b)
 
         XCTAssertEqual(shouldBe, isActually, "...")
-        self.thenDiffsShouldNotContainRepeatedDiffTypes(isActually)
+        self.thenDiffsShouldNotContainRepeatedDiffTypes(array: isActually)
     }
 
     func test012_longCase() {
@@ -328,7 +319,7 @@ class DiffTests: XCTestCase {
 
         let isActually = diffBetweenArrays(arrayA: a, arrayB: b)
 
-        self.thenDiffsShouldNotContainRepeatedDiffTypes(isActually)
+        self.thenDiffsShouldNotContainRepeatedDiffTypes(array: isActually)
     }
 
     // this test is more a code coverage test. The debug description is not a vital part
@@ -342,6 +333,5 @@ class DiffTests: XCTestCase {
         print("debug description: \(diffs)")
     }
 }
-
 
 // swiftlint:enable type_body_length

@@ -13,44 +13,39 @@ import Foundation
 import FURRExtensions
 
 public enum DiffOperation {
-    case Delete
-    case Insert
-    case Equal
+    case delete
+    case insert
+    case equal
 
     func debugDescription() -> String {
         switch self {
-        case .Delete:
+        case .delete:
             return "delete"
-        case .Equal:
+        case .equal:
             return "equal"
-        case .Insert:
+        case .insert:
             return "insert"
         }
     }
 }
 
-public class Diff<T:Equatable>: Equatable, CustomDebugStringConvertible {
-    public var operation: DiffOperation
-    public var array: Array<T>
+public class Diff<T: Equatable>: Equatable, CustomDebugStringConvertible {
+    public let operation: DiffOperation
+    public var array: [T]
 
-    init(operation inOperation: DiffOperation, array inArray: Array<T>) {
-        assert(inArray.count != 0, "array may not be empty")
-        self.operation = inOperation
-        self.array = inArray
+    init(operation: DiffOperation, array: [T]) {
+        assert(array.count != 0, "array may not be empty")
+        self.operation = operation
+        self.array = array
     }
 
     public var debugDescription: String {
-        get {
-            var result: String = self.operation.debugDescription()
-            result = result + " " + self.array.debugDescription
+        var result: String = self.operation.debugDescription()
+        result += " " + self.array.debugDescription
 
-            return result
-        }
-
+        return result
     }
 }
-
-
 
 public func == <T: Equatable> (lhs: Diff<T>, rhs: Diff<T>) -> Bool {
     if lhs.operation != rhs.operation {
@@ -60,33 +55,32 @@ public func == <T: Equatable> (lhs: Diff<T>, rhs: Diff<T>) -> Bool {
     return lhs.array == rhs.array
 }
 
+func diff_commonPrefix<T: Equatable>(arrayA: [T], arrayB: [T]) -> [T] {
+    let smallerCount = (arrayA.count < arrayB.count) ? arrayA.count : arrayB.count
 
-func diff_commonPrefix<T: Equatable>(arrayA inArrayA: Array<T>, arrayB inArrayB: Array<T>) -> Array<T> {
-    let smallerCount = (inArrayA.count < inArrayB.count) ? inArrayA.count : inArrayB.count
-
-    var common: Array<T> = []
+    var common: [T] = []
 
     for i in 0 ..< smallerCount {
-        if inArrayA[i] != inArrayB[i] {
+        if arrayA[i] != arrayB[i] {
             break
         } else {
-            common.append(inArrayA[i])
+            common.append(arrayA[i])
         }
     }
 
     return common
 }
 
-func diff_commonSuffix<T: Equatable>(arrayA inArrayA: Array<T>, arrayB inArrayB: Array<T>) -> Array<T> {
-    let smallerCount = (inArrayA.count < inArrayB.count) ? inArrayA.count : inArrayB.count
+func diff_commonSuffix<T: Equatable>(arrayA: [T], arrayB: [T]) -> [T] {
+    let smallerCount = (arrayA.count < arrayB.count) ? arrayA.count : arrayB.count
 
-    var commonReversed: Array<T> = []
+    var commonReversed: [T] = []
 
     for i in 0 ..< smallerCount {
-        if inArrayA[inArrayA.count - 1 - i] != inArrayB[inArrayB.count - 1 - i] {
+        if arrayA[arrayA.count - 1 - i] != arrayB[arrayB.count - 1 - i] {
             break
         } else {
-            commonReversed.append(inArrayA[inArrayA.count - 1 - i])
+            commonReversed.append(arrayA[arrayA.count - 1 - i])
         }
     }
 
@@ -95,17 +89,17 @@ func diff_commonSuffix<T: Equatable>(arrayA inArrayA: Array<T>, arrayB inArrayB:
     return common
 }
 
-private func diff_subArrayToIndex<T>(array inArray: Array<T>, index inIndex: Int) -> Array<T> {
+private func diff_subArrayToIndex<T>(array inArray: [T], index inIndex: Int) -> [T] {
     let result = Array(inArray[0..<inIndex])
     return result
 }
 
-private func diff_subArrayFromIndex<T>(array inArray: Array<T>, index inIndex: Int) -> Array<T> {
+private func diff_subArrayFromIndex<T>(array inArray: [T], index inIndex: Int) -> [T] {
     let result = Array(inArray[inIndex..<inArray.endIndex])
     return result
 }
 
-private func diff_appendDiffsAndCompact<T>(array inArray: Array<Diff<T>>, diffs: Array<Diff<T>>) -> Array<Diff<T>> {
+private func diff_appendDiffsAndCompact<T>(array inArray: [Diff<T>], diffs: [Diff<T>]) -> [Diff<T>] {
     var result = inArray
     for diff in diffs {
         result = diff_appendDiffAndCompact(array: result, diff: diff)
@@ -113,17 +107,13 @@ private func diff_appendDiffsAndCompact<T>(array inArray: Array<Diff<T>>, diffs:
     return result
 }
 
-private func diff_appendDiffAndCompact<T>(array inArray: Array<Diff<T>>, diff: Diff<T>) -> Array<Diff<T>> {
+private func diff_appendDiffAndCompact<T>(array inArray: [Diff<T>], diff: Diff<T>) -> [Diff<T>] {
     guard let lastDiff = inArray.last else {
         return [diff]
     }
 
     if diff.operation == lastDiff.operation {
-        #if swift(>=3.0)
-            lastDiff.array.append(contentsOf:diff.array)
-        #else
-            lastDiff.array.appendContentsOf(diff.array)
-        #endif
+        lastDiff.array.append(contentsOf: diff.array)
         return inArray
     }
 
@@ -132,76 +122,99 @@ private func diff_appendDiffAndCompact<T>(array inArray: Array<Diff<T>>, diff: D
     return newArray
 }
 
-func diff_removeCommonPrefix<T: Equatable>(arrayA inArrayA: Array<T>, arrayB inArrayB: Array<T>) -> (common: Array<T>, remainingA: Array<T>, remainingB: Array<T>) {
+internal struct DiffCommonAndRemaining<T: Equatable> {
+    let common: [T]
+    let remainingA: [T]
+    let remainingB: [T]
+}
+
+func diff_removeCommonPrefix<T: Equatable>(arrayA inArrayA: [T], arrayB inArrayB: [T]) -> DiffCommonAndRemaining<T> {
     let commonPrefix = diff_commonPrefix(arrayA: inArrayA, arrayB: inArrayB)
     let remainingArrayA = diff_subArrayFromIndex(array: inArrayA, index: commonPrefix.count)
     let remainingArrayB = diff_subArrayFromIndex(array: inArrayB, index: commonPrefix.count)
-    return (commonPrefix, remainingArrayA, remainingArrayB)
+    return DiffCommonAndRemaining(common: commonPrefix, remainingA: remainingArrayA, remainingB: remainingArrayB)
 }
 
-func diff_removeCommonSuffix<T: Equatable>(arrayA inArrayA: Array<T>, arrayB inArrayB: Array<T>) -> (common: Array<T>, remainingA: Array<T>, remainingB: Array<T>) {
+func diff_removeCommonSuffix<T: Equatable>(arrayA inArrayA: [T], arrayB inArrayB: [T]) -> DiffCommonAndRemaining<T> {
     let commonSuffix = diff_commonSuffix(arrayA: inArrayA, arrayB: inArrayB)
     let restOfArrayA = diff_subArrayToIndex(array: inArrayA, index: inArrayA.count - commonSuffix.count)
     let restOfArrayB = diff_subArrayToIndex(array: inArrayB, index: inArrayB.count - commonSuffix.count)
-    return (commonSuffix, restOfArrayA, restOfArrayB)
+    return DiffCommonAndRemaining(common: commonSuffix, remainingA: restOfArrayA, remainingB: restOfArrayB)
 }
 
-public func diffBetweenArrays<T: Equatable>(arrayA inArrayA: Array<T>, arrayB inArrayB: Array<T>) -> Array<Diff<T>> {
+public func diffBetweenArrays<T: Equatable>(arrayA inArrayA: [T], arrayB inArrayB: [T]) -> [Diff<T>] {
 
     // Check for equality (speedup).
     if inArrayA == inArrayB {
         if inArrayA.count != 0 {
-            return [Diff(operation:.Equal, array: inArrayA)]
+            return [Diff(operation:.equal, array: inArrayA)]
         }
         return []
     }
 
-    var resultDiffs: Array<Diff<T>> = Array()
+    var resultDiffs: [Diff<T>] = []
+
+    // e.g.
+    // A: [111222333]
+    // B: [111444333]
 
     // Trim off common prefix (speedup).
-    let (commonPrefix, remainingSuffixArrayA, remainingSuffixArrayB) = diff_removeCommonPrefix(arrayA: inArrayA, arrayB: inArrayB)
+    let commonPrefixAndRemaining = diff_removeCommonPrefix(arrayA: inArrayA, arrayB: inArrayB)
+
+    // commonPrefix: [111]
+    // remainingA:       [222333]
+    // remainingB:       [444333]
 
     // Trim off common suffix (speedup).
-    let (commonSuffix, remainingArrayA, remainingArrayB) = diff_removeCommonSuffix(arrayA: remainingSuffixArrayA, arrayB: remainingSuffixArrayB)
+    let commonSuffixAndRemaining = diff_removeCommonSuffix(arrayA: commonPrefixAndRemaining.remainingA, arrayB: commonPrefixAndRemaining.remainingB)
 
-    // add common suffix as equal
-    if commonPrefix.count != 0 {
-        resultDiffs = diff_appendDiffAndCompact(array: resultDiffs, diff: Diff(operation:.Equal, array: commonPrefix))
+    // commonPrefix:     [333]
+    // remainingA:   [222]
+    // remainingB:   [444]
+
+    // add common prefix as equal
+    if commonPrefixAndRemaining.common.count != 0 {
+        resultDiffs = diff_appendDiffAndCompact(array: resultDiffs, diff: Diff(operation:.equal, array: commonPrefixAndRemaining.common))
     }
+
+    // [eq: 111]
 
     // diff the remaining part
-    let middlePart = diff_computeDiffsBetweenArrays(arrayA: remainingArrayA, arrayB: remainingArrayB)
+    let middlePart = diff_computeDiffsBetweenArrays(arrayA: commonSuffixAndRemaining.remainingA, arrayB: commonSuffixAndRemaining.remainingB)
     resultDiffs = diff_appendDiffsAndCompact(array: resultDiffs, diffs: middlePart)
 
+    // [eq: 111][..: ...][..: ...]
+
     // add the common suffix as equal
-    if commonSuffix.count != 0 {
-        resultDiffs = diff_appendDiffAndCompact(array: resultDiffs, diff: Diff(operation:.Equal, array: commonSuffix))
+    if commonSuffixAndRemaining.common.count != 0 {
+        resultDiffs = diff_appendDiffAndCompact(array: resultDiffs, diff: Diff(operation:.equal, array: commonSuffixAndRemaining.common))
     }
+
+    // [eq: 111][..: ...][..: ...][eq: 333]
 
     return resultDiffs
 }
 
-
-private func diff_computeDiffsBetweenArrays<T: Equatable>(arrayA inArrayA: Array<T>, arrayB inArrayB: Array<T>) -> Array<Diff<T>> {
-    if inArrayA.count == 0 && inArrayB.count == 0 {
+private func diff_computeDiffsBetweenArrays<T: Equatable>(arrayA: [T], arrayB: [T]) -> [Diff<T>] {
+    if arrayA.count == 0 && arrayB.count == 0 {
         // this case is not covered by the tests so I put a assert here.
         // please file a bug if it is hit!
         assertionFailure("Please file a bug!")
         return []
     }
 
-    if inArrayA.count == 0 {
+    if arrayA.count == 0 {
         // Just add some text (speedup).
-        return [Diff(operation:.Insert, array:inArrayB)]
+        return [Diff(operation:.insert, array:arrayB)]
     }
 
-    if inArrayB.count == 0 {
+    if arrayB.count == 0 {
         // Just delete some text (speedup).
-        return [Diff(operation:.Delete, array:inArrayA)]
+        return [Diff(operation:.delete, array:arrayA)]
     }
 
-    var longArray = inArrayA.count > inArrayB.count ? inArrayA : inArrayB
-    var shortArray = inArrayA.count > inArrayB.count ? inArrayB : inArrayA
+    var longArray = arrayA.count > arrayB.count ? arrayA : arrayB
+    var shortArray = arrayA.count > arrayB.count ? arrayB : arrayA
 
     if shortArray.count == 1 && longArray.count == 1 {
         // Single character strings.
@@ -209,22 +222,21 @@ private func diff_computeDiffsBetweenArrays<T: Equatable>(arrayA inArrayA: Array
             // this case is not covered by the tests so I put a assert here.
             // please file a bug if it is hit!
             assertionFailure("Please file a bug!")
-            return [Diff(operation: .Equal, array: shortArray)]
+            return [Diff(operation: .equal, array: shortArray)]
         }
 
-        return [
-            Diff(operation: .Delete, array: inArrayA),
-            Diff(operation: .Insert, array: inArrayB),
-        ]
+        let delete = Diff<T>(operation: .delete, array: arrayA)
+        let insert = Diff<T>(operation: .insert, array: arrayB)
+        return [delete, insert]
     }
 
-    return diff_bisectOfArrays(arrayA: inArrayA, arrayB: inArrayB)
+    return diff_bisectOfArrays(arrayA: arrayA, arrayB: arrayB)
 }
 
 // yes this method is way too long. Pull requests welcome!
 
 // swiftlint:disable function_body_length
-func diff_bisectOfArrays<T: Equatable>(arrayA inArrayA: Array<T>, arrayB inArrayB: Array<T>) -> Array<Diff<T>> {
+func diff_bisectOfArrays<T: Equatable>(arrayA inArrayA: [T], arrayB inArrayB: [T]) -> [Diff<T>] {
     let arrayALength = inArrayA.count
     let arrayBLength = inArrayB.count
     var haveFoundDiffs = false
@@ -238,8 +250,8 @@ func diff_bisectOfArrays<T: Equatable>(arrayA inArrayA: Array<T>, arrayB inArray
         vLength = vOffset + 2
     }
 
-    var v1: Array<Int> = Array()
-    var v2: Array<Int> = Array()
+    var v1: [Int] = []
+    var v2: [Int] = []
 
     for _ in 0..<vLength {
         v1.append(-1)
@@ -371,24 +383,16 @@ func diff_bisectOfArrays<T: Equatable>(arrayA inArrayA: Array<T>, arrayB inArray
     }
 
     if !haveFoundDiffs {
-        // we have not found a shortest snake so we couldn't cut the problem in half.
+        // we haven't found a snake at all so we couldn't cut the problem in half.
         // This means we have no common element. Just add the diffs straight away.
-        diffs = [Diff(operation: .Delete, array: inArrayA)]
-        #if swift(>=3.0)
-            diffs.append(contentsOf:[Diff(operation: .Insert, array: inArrayB)])
-        #else
-            diffs.appendContentsOf([Diff(operation: .Insert, array: inArrayB)])
-        #endif
+        diffs = [Diff(operation: .delete, array: inArrayA), Diff(operation: .insert, array: inArrayB)]
     }
 
     return diffs
 }
 // swiftlint:enable function_body_length
 
-private func diff_bisectSplitOfArrays<T: Equatable>(arrayA inArrayA: Array<T>,
-                                      arrayB inArrayB: Array<T>,
-                                      x inX: Int,
-                                      y inY: Int) -> Array<Diff<T>> {
+private func diff_bisectSplitOfArrays<T: Equatable>(arrayA inArrayA: [T], arrayB inArrayB: [T], x inX: Int, y inY: Int) -> [Diff<T>] {
     let arrayAa = diff_subArrayToIndex(array: inArrayA, index: inX)
     let arrayBa = diff_subArrayToIndex(array: inArrayB, index: inY)
     let arrayAb = diff_subArrayFromIndex(array: inArrayA, index: inX)

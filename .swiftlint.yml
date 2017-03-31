@@ -2,3 +2,6 @@
 # The user of this code might have a different set of rules.
 
 disabled_rules: # rule identifiers to exclude from running
+
+excluded: # paths to ignore during linting. Takes precedence over `included`.
+ - build
