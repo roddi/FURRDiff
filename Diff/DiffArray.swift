@@ -47,7 +47,7 @@ public class Diff<T: Equatable>: Equatable, CustomDebugStringConvertible {
     }
 }
 
-public func == <T: Equatable> (lhs: Diff<T>, rhs: Diff<T>) -> Bool {
+public func == <T> (lhs: Diff<T>, rhs: Diff<T>) -> Bool {
     if lhs.operation != rhs.operation {
         return false
     }
