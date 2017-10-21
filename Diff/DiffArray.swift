@@ -147,7 +147,7 @@ public func diffBetweenArrays<T: Equatable>(arrayA inArrayA: [T], arrayB inArray
     // Check for equality (speedup).
     if inArrayA == inArrayB {
         if inArrayA.count != 0 {
-            return [Diff(operation:.equal, array: inArrayA)]
+            return [Diff(operation: .equal, array: inArrayA)]
         }
         return []
     }
@@ -174,7 +174,7 @@ public func diffBetweenArrays<T: Equatable>(arrayA inArrayA: [T], arrayB inArray
 
     // add common prefix as equal
     if commonPrefixAndRemaining.common.count != 0 {
-        resultDiffs = diff_appendDiffAndCompact(array: resultDiffs, diff: Diff(operation:.equal, array: commonPrefixAndRemaining.common))
+        resultDiffs = diff_appendDiffAndCompact(array: resultDiffs, diff: Diff(operation: .equal, array: commonPrefixAndRemaining.common))
     }
 
     // [eq: 111]
@@ -187,7 +187,7 @@ public func diffBetweenArrays<T: Equatable>(arrayA inArrayA: [T], arrayB inArray
 
     // add the common suffix as equal
     if commonSuffixAndRemaining.common.count != 0 {
-        resultDiffs = diff_appendDiffAndCompact(array: resultDiffs, diff: Diff(operation:.equal, array: commonSuffixAndRemaining.common))
+        resultDiffs = diff_appendDiffAndCompact(array: resultDiffs, diff: Diff(operation: .equal, array: commonSuffixAndRemaining.common))
     }
 
     // [eq: 111][..: ...][..: ...][eq: 333]
@@ -205,12 +205,12 @@ private func diff_computeDiffsBetweenArrays<T: Equatable>(arrayA: [T], arrayB: [
 
     if arrayA.count == 0 {
         // Just add some text (speedup).
-        return [Diff(operation:.insert, array:arrayB)]
+        return [Diff(operation: .insert, array: arrayB)]
     }
 
     if arrayB.count == 0 {
         // Just delete some text (speedup).
-        return [Diff(operation:.delete, array:arrayA)]
+        return [Diff(operation: .delete, array: arrayA)]
     }
 
     var longArray = arrayA.count > arrayB.count ? arrayA : arrayB

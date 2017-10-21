@@ -32,7 +32,6 @@ import XCTest
 
 // long test class is long (which is a good thing in this case, right?)
 
-// swiftlint:disable type_body_length
 class DiffTests: XCTestCase {
 
     override func setUp() {
@@ -75,13 +74,13 @@ class DiffTests: XCTestCase {
         XCTAssert(commonSuffixAndRemains.remainingB == expRemainB)
     }
 
-    func thenDiffsShouldNotContainRepeatedDiffTypes<T: Equatable>(array: [Diff<T>]) {
+    func thenDiffsShouldNotContainRepeatedDiffTypes<T>(array: [Diff<T>]) {
         if array.count < 2 {
             return
         }
 
         guard let firstDiff = array.first else {
-            XCTFail()
+            XCTFail("there must be a diff!")
             return
         }
 
