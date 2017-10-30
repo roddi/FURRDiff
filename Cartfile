@@ -1,4 +1,4 @@
-github "roddi/FURRExtensions" "0.3.4"
+github "roddi/FURRExtensions"
 
 # this is only for me testing new releases. Please ignore
 # git "file:///Users/roddi/GitDev/FURRExtensions" "master"
