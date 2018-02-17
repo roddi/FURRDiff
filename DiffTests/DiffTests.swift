@@ -27,7 +27,6 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // relax some rules for the test code
-// swiftlint:disable identifier_name
 
 import Foundation
 import XCTest

@@ -236,7 +236,6 @@ private func diff_computeDiffsBetweenArrays<T: Equatable>(arrayA: [T], arrayB: [
 // yes this method is way too long. Pull requests welcome!
 
 // swiftlint:disable function_body_length
-// swiftlint:disable identifier_name
 func diff_bisectOfArrays<T: Equatable>(arrayA inArrayA: [T], arrayB inArrayB: [T]) -> [Diff<T>] {
     let arrayALength = inArrayA.count
     let arrayBLength = inArrayB.count
@@ -392,7 +391,6 @@ func diff_bisectOfArrays<T: Equatable>(arrayA inArrayA: [T], arrayB inArrayB: [T
     return diffs
 }
 // swiftlint:enable function_body_length
-// swiftlint:enable identifier_name
 
 private func diff_bisectSplitOfArrays<T: Equatable>(arrayA inArrayA: [T], arrayB inArrayB: [T], x inX: Int, y inY: Int) -> [Diff<T>] {
     let arrayAa = diff_subArrayToIndex(array: inArrayA, index: inX)
