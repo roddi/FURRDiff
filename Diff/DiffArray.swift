@@ -60,11 +60,11 @@ func diff_commonPrefix<T: Equatable>(arrayA: [T], arrayB: [T]) -> [T] {
 
     var common: [T] = []
 
-    for i in 0 ..< smallerCount {
-        if arrayA[i] != arrayB[i] {
+    for idx in 0 ..< smallerCount {
+        if arrayA[idx] != arrayB[idx] {
             break
         } else {
-            common.append(arrayA[i])
+            common.append(arrayA[idx])
         }
     }
 
@@ -76,11 +76,11 @@ func diff_commonSuffix<T: Equatable>(arrayA: [T], arrayB: [T]) -> [T] {
 
     var commonReversed: [T] = []
 
-    for i in 0 ..< smallerCount {
-        if arrayA[arrayA.count - 1 - i] != arrayB[arrayB.count - 1 - i] {
+    for idx in 0 ..< smallerCount {
+        if arrayA[arrayA.count - 1 - idx] != arrayB[arrayB.count - 1 - idx] {
             break
         } else {
-            commonReversed.append(arrayA[arrayA.count - 1 - i])
+            commonReversed.append(arrayA[arrayA.count - 1 - idx])
         }
     }
 
@@ -236,6 +236,7 @@ private func diff_computeDiffsBetweenArrays<T: Equatable>(arrayA: [T], arrayB: [
 // yes this method is way too long. Pull requests welcome!
 
 // swiftlint:disable function_body_length
+// swiftlint:disable identifier_name
 func diff_bisectOfArrays<T: Equatable>(arrayA inArrayA: [T], arrayB inArrayB: [T]) -> [Diff<T>] {
     let arrayALength = inArrayA.count
     let arrayBLength = inArrayB.count
@@ -391,6 +392,7 @@ func diff_bisectOfArrays<T: Equatable>(arrayA inArrayA: [T], arrayB inArrayB: [T
     return diffs
 }
 // swiftlint:enable function_body_length
+// swiftlint:enable identifier_name
 
 private func diff_bisectSplitOfArrays<T: Equatable>(arrayA inArrayA: [T], arrayB inArrayB: [T], x inX: Int, y inY: Int) -> [Diff<T>] {
     let arrayAa = diff_subArrayToIndex(array: inArrayA, index: inX)
