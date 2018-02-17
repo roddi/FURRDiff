@@ -274,21 +274,21 @@ func diff_bisectOfArrays<T: Equatable>(arrayA inArrayA: [T], arrayB inArrayB: [T
     var k2end = 0
 
     //
-    for d in 0..<maxD {
+    for currentD in 0..<maxD {
 
         // Walk the front path one step.
-        var k1 = -d + k1start
-        while k1 <= d - k1end {
+        var k1 = -currentD + k1start
+        while k1 <= currentD - k1end {
             defer {
                 k1 += 2
             }
-            let k1_offset = vOffset + k1
+            let k1Offset = vOffset + k1
             var x1 = 0
 
-            if k1 == -d || (k1 != d && v1[k1_offset - 1] < v1[k1_offset + 1]) {
-                x1 = v1[k1_offset + 1]
+            if k1 == -currentD || (k1 != currentD && v1[k1Offset - 1] < v1[k1Offset + 1]) {
+                x1 = v1[k1Offset + 1]
             } else {
-                x1 = v1[k1_offset - 1] + 1
+                x1 = v1[k1Offset - 1] + 1
             }
 
             var y1 = x1 - k1
@@ -299,7 +299,7 @@ func diff_bisectOfArrays<T: Equatable>(arrayA inArrayA: [T], arrayB inArrayB: [T
                 y1 += 1
             }
 
-            v1[k1_offset] = x1
+            v1[k1Offset] = x1
 
             if x1 > arrayALength {
                 // Ran off the right of the graph.
@@ -308,11 +308,11 @@ func diff_bisectOfArrays<T: Equatable>(arrayA inArrayA: [T], arrayB inArrayB: [T
                 // Ran off the bottom of the graph.
                 k1start += 2
             } else if front {
-                let k2_offset = vOffset + delta - k1
+                let k2Offset = vOffset + delta - k1
 
-                if k2_offset >= 0 && k2_offset < vLength && v2[k2_offset] != -1 {
+                if k2Offset >= 0 && k2Offset < vLength && v2[k2Offset] != -1 {
                     // Mirror x2 onto top-left coordinate system.
-                    let x2 = arrayALength - v2[k2_offset]
+                    let x2 = arrayALength - v2[k2Offset]
                     if x1 >= x2 {
                         // diffs = diff_bisectSplitOfStrings(text1, text2, x1, y1, properties);
                         diffs = diff_bisectSplitOfArrays(arrayA: inArrayA, arrayB: inArrayB, x: x1, y: y1)
@@ -328,19 +328,19 @@ func diff_bisectOfArrays<T: Equatable>(arrayA inArrayA: [T], arrayB inArrayB: [T
         }
 
         // Walk the reverse path one step.
-        var k2 = -d + k2start
-        while  k2 <= d - k2end {
+        var k2 = -currentD + k2start
+        while  k2 <= currentD - k2end {
 
             defer {
                 k2 += 2
             }
-            let k2_offset = vOffset + k2
+            let k2Offset = vOffset + k2
             var x2 = 0
 
-            if k2 == -d || (k2 != d && v2[k2_offset - 1] < v2[k2_offset + 1]) {
-                x2 = v2[k2_offset + 1]
+            if k2 == -currentD || (k2 != currentD && v2[k2Offset - 1] < v2[k2Offset + 1]) {
+                x2 = v2[k2Offset + 1]
             } else {
-                x2 = v2[k2_offset - 1] + 1
+                x2 = v2[k2Offset - 1] + 1
             }
 
             var y2 = x2 - k2
@@ -350,7 +350,7 @@ func diff_bisectOfArrays<T: Equatable>(arrayA inArrayA: [T], arrayB inArrayB: [T
                 y2 += 1
             }
 
-            v2[k2_offset] = x2
+            v2[k2Offset] = x2
 
             if x2 > arrayALength {
                 // Ran off the left of the graph.
@@ -359,11 +359,11 @@ func diff_bisectOfArrays<T: Equatable>(arrayA inArrayA: [T], arrayB inArrayB: [T
                 // Ran off the top of the graph.
                 k2start += 2
             } else if !front {
-                let k1_offset = vOffset + delta - k2
+                let k1Offset = vOffset + delta - k2
 
-                if k1_offset >= 0 && k1_offset < vLength && v1[k1_offset] != -1 {
-                    let x1 = v1[k1_offset]
-                    let y1 = vOffset + x1 - k1_offset
+                if k1Offset >= 0 && k1Offset < vLength && v1[k1Offset] != -1 {
+                    let x1 = v1[k1Offset]
+                    let y1 = vOffset + x1 - k1Offset
                     // Mirror x2 onto top-left coordinate system.
                     x2 = arrayALength - x2
 
