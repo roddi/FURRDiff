@@ -1,6 +1,5 @@
 // swiftlint:disable line_length
 // swiftlint:disable file_length
-// swiftlint:disable cyclomatic_complexity
 //
 //  DiffArray.swift
 //  DBDB
@@ -233,16 +232,131 @@ private func diff_computeDiffsBetweenArrays<T: Equatable>(arrayA: [T], arrayB: [
     return diff_bisectOfArrays(arrayA: arrayA, arrayB: arrayB)
 }
 
+private class Kay {
+    var start: Int = 0
+    var end: Int = 0
+    var index: Int = 0
+}
+
+private struct CommonPathParameters<T: Equatable> {
+    let vOffset: Int
+    let inArrayA: [T]
+    let inArrayB: [T]
+    let front: Bool
+    let delta: Int
+    let vLength: Int
+}
+
+private func walkFrontPath<T: Equatable>(
+    commonParameters: CommonPathParameters<T>,
+    currentD: Int,
+    kay1: Kay,
+    vectors1: inout [Int],
+    vectors2: inout [Int]) -> [Diff<T>] {
+
+    while kay1.index <= currentD - kay1.end {
+        defer {
+            kay1.index += 2
+        }
+        let k1Offset = commonParameters.vOffset + kay1.index
+        var x1 = 0
+
+        if kay1.index == -currentD || (kay1.index != currentD && vectors1[k1Offset - 1] < vectors1[k1Offset + 1]) {
+            x1 = vectors1[k1Offset + 1]
+        } else {
+            x1 = vectors1[k1Offset - 1] + 1
+        }
+
+        var y1 = x1 - kay1.index
+
+        // follow the snake!
+        while x1 < commonParameters.inArrayA.count && y1 < commonParameters.inArrayB.count && commonParameters.inArrayA[x1] == commonParameters.inArrayB[y1] {
+            x1 += 1
+            y1 += 1
+        }
+
+        vectors1[k1Offset] = x1
+
+        if x1 > commonParameters.inArrayA.count {
+            // Ran off the right of the graph.
+            kay1.end += 2
+        } else if y1 > commonParameters.inArrayB.count {
+            // Ran off the bottom of the graph.
+            kay1.start += 2
+        } else if commonParameters.front {
+            let k2Offset = commonParameters.vOffset + commonParameters.delta - kay1.index
+
+            if k2Offset >= 0 && k2Offset < commonParameters.vLength && vectors2[k2Offset] != -1 {
+                // Mirror x2 onto top-left coordinate system.
+                let x2 = commonParameters.inArrayA.count - vectors2[k2Offset]
+                if x1 >= x2 {
+                    // diffs = diff_bisectSplitOfStrings(text1, text2, x1, y1, properties);
+                    return diff_bisectSplitOfArrays(arrayA: commonParameters.inArrayA, arrayB: commonParameters.inArrayB, x: x1, y: y1)
+                }
+            }
+        }
+    }
+    return []
+}
+
+private func walkReversePath<T: Equatable>(
+    commonParameters: CommonPathParameters<T>,
+    currentD: Int,
+    kay2: Kay,
+    vectors1: inout [Int],
+    vectors2: inout [Int]) -> [Diff<T>] {
+
+    while kay2.index <= currentD - kay2.end {
+
+        defer {
+            kay2.index += 2
+        }
+        let k2Offset = commonParameters.vOffset + kay2.index
+        var x2 = 0
+
+        if kay2.index == -currentD || (kay2.index != currentD && vectors2[k2Offset - 1] < vectors2[k2Offset + 1]) {
+            x2 = vectors2[k2Offset + 1]
+        } else {
+            x2 = vectors2[k2Offset - 1] + 1
+        }
+
+        var y2 = x2 - kay2.index
+
+        while x2 < commonParameters.inArrayA.count && y2 < commonParameters.inArrayB.count && (commonParameters.inArrayA[commonParameters.inArrayA.count - x2 - 1] == commonParameters.inArrayB[commonParameters.inArrayB.count - y2 - 1]) {
+            x2 += 1
+            y2 += 1
+        }
+
+        vectors2[k2Offset] = x2
+
+        if x2 > commonParameters.inArrayA.count {
+            // Ran off the left of the graph.
+            kay2.end += 2
+        } else if y2 > commonParameters.inArrayB.count {
+            // Ran off the top of the graph.
+            kay2.start += 2
+        } else if !commonParameters.front {
+            let k1Offset = commonParameters.vOffset + commonParameters.delta - kay2.index
+
+            if k1Offset >= 0 && k1Offset < commonParameters.vLength && vectors1[k1Offset] != -1 {
+                let x1 = vectors1[k1Offset]
+                let y1 = commonParameters.vOffset + x1 - k1Offset
+                // Mirror x2 onto top-left coordinate system.
+                x2 = commonParameters.inArrayA.count - x2
+
+                if x1 >= x2 {
+                    // Overlap detected.
+                    return diff_bisectSplitOfArrays(arrayA: commonParameters.inArrayA, arrayB: commonParameters.inArrayB, x: x1, y: y1)
+                }
+            }
+        }
+    }
+    return []
+}
+
 // yes this method is way too long. Pull requests welcome!
-
-// swiftlint:disable function_body_length
 func diff_bisectOfArrays<T: Equatable>(arrayA inArrayA: [T], arrayB inArrayB: [T]) -> [Diff<T>] {
-    let arrayALength = inArrayA.count
-    let arrayBLength = inArrayB.count
-    var haveFoundDiffs = false
-    var diffs: [Diff<T>]  = []
-
-    let maxD = (arrayALength + arrayBLength + 1) / 2
+    let maxD = (inArrayA.count + inArrayB.count + 1) / 2
     let vOffset = maxD
     var vLength = 2 * maxD
 
@@ -250,145 +364,59 @@ func diff_bisectOfArrays<T: Equatable>(arrayA inArrayA: [T], arrayB inArrayB: [T
         vLength = vOffset + 2
     }
 
-    var v1: [Int] = []
-    var v2: [Int] = []
+    var vectors1: [Int] = []
+    var vectors2: [Int] = []
 
     for _ in 0..<vLength {
-        v1.append(-1)
-        v2.append(-1)
+        vectors1.append(-1)
+        vectors2.append(-1)
     }
+    vectors1[vOffset + 1] = 0
+    vectors2[vOffset + 1] = 0
 
-    v1[vOffset + 1] = 0
-    v2[vOffset + 1] = 0
-
-    let delta = arrayALength - arrayBLength
+    let delta = inArrayA.count - inArrayB.count
 
     // If the total number of characters is odd, then the front path will collide with the reverse path.
     let front = delta % 2 != 0
-    // BOOL front = (delta % 2 != 0);
 
     // Offsets for start and end of k loop. Prevents mapping of space beyond the grid.
-    var k1start = 0
-    var k1end = 0
-    var k2start = 0
-    var k2end = 0
+    let kay1 = Kay()
+    let kay2 = Kay()
 
-    //
+    let commonParameters = CommonPathParameters(vOffset: vOffset, inArrayA: inArrayA, inArrayB: inArrayB, front: front, delta: delta, vLength: vLength)
+
     for currentD in 0..<maxD {
 
         // Walk the front path one step.
-        var k1 = -currentD + k1start
-        while k1 <= currentD - k1end {
-            defer {
-                k1 += 2
-            }
-            let k1Offset = vOffset + k1
-            var x1 = 0
+        kay1.index = -currentD + kay1.start
+        let frontDiffs = walkFrontPath(
+            commonParameters: commonParameters,
+            currentD: currentD,
+            kay1: kay1,
+            vectors1: &vectors1,
+            vectors2: &vectors2)
 
-            if k1 == -currentD || (k1 != currentD && v1[k1Offset - 1] < v1[k1Offset + 1]) {
-                x1 = v1[k1Offset + 1]
-            } else {
-                x1 = v1[k1Offset - 1] + 1
-            }
-
-            var y1 = x1 - k1
-
-            // follow the snake!
-            while x1 < arrayALength && y1 < arrayBLength && inArrayA[x1] == inArrayB[y1] {
-                x1 += 1
-                y1 += 1
-            }
-
-            v1[k1Offset] = x1
-
-            if x1 > arrayALength {
-                // Ran off the right of the graph.
-                k1end += 2
-            } else if y1 > arrayBLength {
-                // Ran off the bottom of the graph.
-                k1start += 2
-            } else if front {
-                let k2Offset = vOffset + delta - k1
-
-                if k2Offset >= 0 && k2Offset < vLength && v2[k2Offset] != -1 {
-                    // Mirror x2 onto top-left coordinate system.
-                    let x2 = arrayALength - v2[k2Offset]
-                    if x1 >= x2 {
-                        // diffs = diff_bisectSplitOfStrings(text1, text2, x1, y1, properties);
-                        diffs = diff_bisectSplitOfArrays(arrayA: inArrayA, arrayB: inArrayB, x: x1, y: y1)
-                        haveFoundDiffs = true
-                        break
-                    }
-                }
-            }
-        }
-
-        if haveFoundDiffs {
-            break
+        if !frontDiffs.isEmpty {
+            return frontDiffs
         }
 
         // Walk the reverse path one step.
-        var k2 = -currentD + k2start
-        while  k2 <= currentD - k2end {
+        kay2.index = -currentD + kay2.start
+        let reverseDiffs = walkReversePath(
+            commonParameters: commonParameters,
+            currentD: currentD,
+            kay2: kay2,
+            vectors1: &vectors1,
+            vectors2: &vectors2)
 
-            defer {
-                k2 += 2
-            }
-            let k2Offset = vOffset + k2
-            var x2 = 0
-
-            if k2 == -currentD || (k2 != currentD && v2[k2Offset - 1] < v2[k2Offset + 1]) {
-                x2 = v2[k2Offset + 1]
-            } else {
-                x2 = v2[k2Offset - 1] + 1
-            }
-
-            var y2 = x2 - k2
-
-            while x2 < arrayALength && y2 < arrayBLength && (inArrayA[arrayALength - x2 - 1] == inArrayB[arrayBLength - y2 - 1]) {
-                x2 += 1
-                y2 += 1
-            }
-
-            v2[k2Offset] = x2
-
-            if x2 > arrayALength {
-                // Ran off the left of the graph.
-                k2end += 2
-            } else if y2 > arrayBLength {
-                // Ran off the top of the graph.
-                k2start += 2
-            } else if !front {
-                let k1Offset = vOffset + delta - k2
-
-                if k1Offset >= 0 && k1Offset < vLength && v1[k1Offset] != -1 {
-                    let x1 = v1[k1Offset]
-                    let y1 = vOffset + x1 - k1Offset
-                    // Mirror x2 onto top-left coordinate system.
-                    x2 = arrayALength - x2
-
-                    if x1 >= x2 {
-                        // Overlap detected.
-                        diffs = diff_bisectSplitOfArrays(arrayA: inArrayA, arrayB: inArrayB, x: x1, y: y1)
-                        haveFoundDiffs = true
-                        break
-                    }
-                }
-            }
-        }
-
-        if haveFoundDiffs {
-            break
+        if !reverseDiffs.isEmpty {
+            return reverseDiffs
         }
     }
 
-    if !haveFoundDiffs {
-        // we haven't found a snake at all so we couldn't cut the problem in half.
-        // This means we have no common element. Just add the diffs straight away.
-        diffs = [Diff(operation: .delete, array: inArrayA), Diff(operation: .insert, array: inArrayB)]
-    }
-
-    return diffs
+    // we haven't found a snake at all so we couldn't cut the problem in half.
+    // This means we have no common element. Just add the diffs straight away.
+    return [Diff(operation: .delete, array: inArrayA), Diff(operation: .insert, array: inArrayB)]
 }
 // swiftlint:enable function_body_length
 
