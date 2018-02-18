@@ -232,16 +232,18 @@ private func diff_computeDiffsBetweenArrays<T: Equatable>(arrayA: [T], arrayB: [
     return diff_bisectOfArrays(arrayA: arrayA, arrayB: arrayB)
 }
 
+private struct FrontPathParameters<T> {
+    let currentD: Int
+    let vOffset: Int
+    let inArrayA: [T]
+    let inArrayB: [T]
+}
+
 // swiftlint:disable function_parameter_count
-private func walkFrontPath<T>(kIndex1: inout Int,
-                              currentD: Int,
+private func walkFrontPath<T>(parameters: FrontPathParameters<T>,
+                              kIndex1: inout Int,
                               k1end: inout Int,
-                              vOffset: Int,
                               vectors1: inout [Int],
-                              arrayALength: Int,
-                              arrayBLength: Int,
-                              inArrayA: [T],
-                              inArrayB: [T],
                               k1start: inout Int,
                               front: Bool,
                               delta: Int,
@@ -250,14 +252,14 @@ private func walkFrontPath<T>(kIndex1: inout Int,
                               diffs: inout [Diff<T>]) -> Bool {
 
     var haveFoundDiffs = false // assume
-    while kIndex1 <= currentD - k1end {
+    while kIndex1 <= parameters.currentD - k1end {
         defer {
             kIndex1 += 2
         }
-        let k1Offset = vOffset + kIndex1
+        let k1Offset = parameters.vOffset + kIndex1
         var x1 = 0
 
-        if kIndex1 == -currentD || (kIndex1 != currentD && vectors1[k1Offset - 1] < vectors1[k1Offset + 1]) {
+        if kIndex1 == -parameters.currentD || (kIndex1 != parameters.currentD && vectors1[k1Offset - 1] < vectors1[k1Offset + 1]) {
             x1 = vectors1[k1Offset + 1]
         } else {
             x1 = vectors1[k1Offset - 1] + 1
@@ -266,28 +268,28 @@ private func walkFrontPath<T>(kIndex1: inout Int,
         var y1 = x1 - kIndex1
 
         // follow the snake!
-        while x1 < arrayALength && y1 < arrayBLength && inArrayA[x1] == inArrayB[y1] {
+        while x1 < parameters.inArrayA.count && y1 < parameters.inArrayB.count && parameters.inArrayA[x1] == parameters.inArrayB[y1] {
             x1 += 1
             y1 += 1
         }
 
         vectors1[k1Offset] = x1
 
-        if x1 > arrayALength {
+        if x1 > parameters.inArrayA.count {
             // Ran off the right of the graph.
             k1end += 2
-        } else if y1 > arrayBLength {
+        } else if y1 > parameters.inArrayB.count {
             // Ran off the bottom of the graph.
             k1start += 2
         } else if front {
-            let k2Offset = vOffset + delta - kIndex1
+            let k2Offset = parameters.vOffset + delta - kIndex1
 
             if k2Offset >= 0 && k2Offset < vLength && vectors2[k2Offset] != -1 {
                 // Mirror x2 onto top-left coordinate system.
-                let x2 = arrayALength - vectors2[k2Offset]
+                let x2 = parameters.inArrayA.count - vectors2[k2Offset]
                 if x1 >= x2 {
                     // diffs = diff_bisectSplitOfStrings(text1, text2, x1, y1, properties);
-                    diffs = diff_bisectSplitOfArrays(arrayA: inArrayA, arrayB: inArrayB, x: x1, y: y1)
+                    diffs = diff_bisectSplitOfArrays(arrayA: parameters.inArrayA, arrayB: parameters.inArrayB, x: x1, y: y1)
                     haveFoundDiffs = true
                     break
                 }
@@ -298,7 +300,20 @@ private func walkFrontPath<T>(kIndex1: inout Int,
     return haveFoundDiffs
 }
 
-private func walkReservePath<T: Equatable>(kIndex2: inout Int, _ currentD: Int, _ k2end: inout Int, _ vOffset: Int, _ vectors2: inout [Int], _ arrayALength: Int, _ arrayBLength: Int, _ inArrayA: [T], _ inArrayB: [T], _ k2start: inout Int, _ front: Bool, _ delta: Int, _ vLength: Int, _ v1: inout [Int], _ diffs: inout [Diff<T>], _ haveFoundDiffs: inout Bool) {
+private func walkReversePath<T: Equatable>(kIndex2: inout Int,
+                                           currentD: Int,
+                                           k2end: inout Int,
+                                           vOffset: Int,
+                                           vectors2: inout [Int],
+                                           inArrayA: [T],
+                                           inArrayB: [T],
+                                           k2start: inout Int,
+                                           front: Bool,
+                                           delta: Int,
+                                           vLength: Int,
+                                           vectors1: inout [Int],
+                                           diffs: inout [Diff<T>],
+                                           haveFoundDiffs: inout Bool) {
     while kIndex2 <= currentD - k2end {
 
         defer {
@@ -315,27 +330,27 @@ private func walkReservePath<T: Equatable>(kIndex2: inout Int, _ currentD: Int, 
 
         var y2 = x2 - kIndex2
 
-        while x2 < arrayALength && y2 < arrayBLength && (inArrayA[arrayALength - x2 - 1] == inArrayB[arrayBLength - y2 - 1]) {
+        while x2 < inArrayA.count && y2 < inArrayB.count && (inArrayA[inArrayA.count - x2 - 1] == inArrayB[inArrayB.count - y2 - 1]) {
             x2 += 1
             y2 += 1
         }
 
         vectors2[k2Offset] = x2
 
-        if x2 > arrayALength {
+        if x2 > inArrayA.count {
             // Ran off the left of the graph.
             k2end += 2
-        } else if y2 > arrayBLength {
+        } else if y2 > inArrayB.count {
             // Ran off the top of the graph.
             k2start += 2
         } else if !front {
             let k1Offset = vOffset + delta - kIndex2
 
-            if k1Offset >= 0 && k1Offset < vLength && v1[k1Offset] != -1 {
-                let x1 = v1[k1Offset]
+            if k1Offset >= 0 && k1Offset < vLength && vectors1[k1Offset] != -1 {
+                let x1 = vectors1[k1Offset]
                 let y1 = vOffset + x1 - k1Offset
                 // Mirror x2 onto top-left coordinate system.
-                x2 = arrayALength - x2
+                x2 = inArrayA.count - x2
 
                 if x1 >= x2 {
                     // Overlap detected.
@@ -378,7 +393,6 @@ func diff_bisectOfArrays<T: Equatable>(arrayA inArrayA: [T], arrayB inArrayB: [T
 
     // If the total number of characters is odd, then the front path will collide with the reverse path.
     let front = delta % 2 != 0
-    // BOOL front = (delta % 2 != 0);
 
     // Offsets for start and end of k loop. Prevents mapping of space beyond the grid.
     var k1start = 0
@@ -391,15 +405,13 @@ func diff_bisectOfArrays<T: Equatable>(arrayA inArrayA: [T], arrayB inArrayB: [T
 
         // Walk the front path one step.
         var kIndex1 = -currentD + k1start
-        if walkFrontPath(kIndex1: &kIndex1,
-                      currentD: currentD,
+
+        let parameters = FrontPathParameters(currentD: currentD, vOffset: vOffset, inArrayA: inArrayA, inArrayB: inArrayB)
+        if walkFrontPath(
+            parameters: parameters,
+            kIndex1: &kIndex1,
                       k1end: &k1end,
-                      vOffset: vOffset,
                       vectors1: &vectors1,
-                      arrayALength: arrayALength,
-                      arrayBLength: arrayBLength,
-                      inArrayA: inArrayA,
-                      inArrayB: inArrayB,
                       k1start: &k1start,
                       front: front,
                       delta: delta,
@@ -412,7 +424,20 @@ func diff_bisectOfArrays<T: Equatable>(arrayA inArrayA: [T], arrayB inArrayB: [T
 
         // Walk the reverse path one step.
         var kIndex2 = -currentD + k2start
-        walkReservePath(kIndex2: &kIndex2, currentD, &k2end, vOffset, &vectors2, arrayALength, arrayBLength, inArrayA, inArrayB, &k2start, front, delta, vLength, &vectors1, &diffs, &haveFoundDiffs)
+        walkReversePath(kIndex2: &kIndex2,
+                        currentD: currentD,
+                        k2end: &k2end,
+                        vOffset: vOffset,
+                        vectors2: &vectors2,
+                        inArrayA: inArrayA,
+                        inArrayB: inArrayB,
+                        k2start: &k2start,
+                        front: front,
+                        delta: delta,
+                        vLength: vLength,
+                        vectors1: &vectors1,
+                        diffs: &diffs,
+                        haveFoundDiffs: &haveFoundDiffs)
 
         if haveFoundDiffs {
             break
