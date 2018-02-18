@@ -355,11 +355,6 @@ private func walkReversePath<T: Equatable>(
 }
 
 // yes this method is way too long. Pull requests welcome!
-private func debugPrint(kay: Kay, vectors1: [Int], vectors2: [Int]) {
-    print("--- kIndex: \(kay.index), kstart: \(kay.start), kend: \(kay.end), ")
-    print("--- vectors1: \(vectors1), vectors2: \(vectors2)")
-}
-
 func diff_bisectOfArrays<T: Equatable>(arrayA inArrayA: [T], arrayB inArrayB: [T]) -> [Diff<T>] {
     let maxD = (inArrayA.count + inArrayB.count + 1) / 2
     let vOffset = maxD
@@ -394,8 +389,6 @@ func diff_bisectOfArrays<T: Equatable>(arrayA inArrayA: [T], arrayB inArrayB: [T
 
         // Walk the front path one step.
         kay1.index = -currentD + kay1.start
-        debugPrint(kay: kay1, vectors1: vectors1, vectors2: vectors2)
-
         let frontDiffs = walkFrontPath(
             commonParameters: commonParameters,
             currentD: currentD,
@@ -403,23 +396,18 @@ func diff_bisectOfArrays<T: Equatable>(arrayA inArrayA: [T], arrayB inArrayB: [T
             vectors1: &vectors1,
             vectors2: &vectors2)
 
-        debugPrint(kay: kay1, vectors1: vectors1, vectors2: vectors2)
-
         if !frontDiffs.isEmpty {
             return frontDiffs
         }
 
         // Walk the reverse path one step.
         kay2.index = -currentD + kay2.start
-        debugPrint(kay: kay2, vectors1: vectors1, vectors2: vectors2)
         let reverseDiffs = walkReversePath(
             commonParameters: commonParameters,
             currentD: currentD,
             kay2: kay2,
             vectors1: &vectors1,
             vectors2: &vectors2)
-
-        debugPrint(kay: kay2, vectors1: vectors1, vectors2: vectors2)
 
         if !reverseDiffs.isEmpty {
             return reverseDiffs
