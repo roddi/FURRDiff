@@ -297,12 +297,12 @@ class DiffTests: XCTestCase {
     }
 
     func test011_prettySimpleCaseWithCharacters() {
-        let arrayA = Array(String("helge").characters)
-        let arrayB = Array(String("anna").characters)
+        let arrayA = Array(String("helge"))
+        let arrayB = Array(String("anna"))
 
         let shouldBe = [
-            Diff(operation: .delete, array: Array(String("helge").characters)),
-            Diff(operation: .insert, array: Array(String("anna").characters))
+            Diff(operation: .delete, array: Array(String("helge"))),
+            Diff(operation: .insert, array: Array(String("anna")))
         ]
 
         let isActually = diffBetweenArrays(arrayA: arrayA, arrayB: arrayB)
@@ -315,8 +315,8 @@ class DiffTests: XCTestCase {
         let aText = "dfhgvsrktzblzbasvfkugkbfgarzkulbdzsasrzlruoiunouizubsvtzkbnuhjmluinsbrtzstbusrxdzsdztkbnsrtztinlukdbzjrthsrtubulz"
         let bText = "dfhgvsrkblzbasvfkugkfzbjdbfgarzkulbdzsasrzlruoiunouizubruwsvtznuhjmluinsbrtzstbusrxdzbkzwksdztkbnsrtztinlukdbzjrthsrtubulz"
 
-        let arrayA = Array(aText.characters)
-        let arrayB = Array(bText.characters)
+        let arrayA = Array(aText)
+        let arrayB = Array(bText)
 
         let isActually = diffBetweenArrays(arrayA: arrayA, arrayB: arrayB)
 

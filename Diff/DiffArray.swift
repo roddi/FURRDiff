@@ -247,6 +247,7 @@ private struct CommonPathParameters<T: Equatable> {
     let vLength: Int
 }
 
+// swiftlint:disable identifier_name
 private func walkFrontPath<T: Equatable>(
     commonParameters: CommonPathParameters<T>,
     currentD: Int,
@@ -353,6 +354,7 @@ private func walkReversePath<T: Equatable>(
     }
     return []
 }
+// swiftlint:enable identifier_name
 
 // yes this method is way too long. Pull requests welcome!
 func diff_bisectOfArrays<T: Equatable>(arrayA inArrayA: [T], arrayB inArrayB: [T]) -> [Diff<T>] {
